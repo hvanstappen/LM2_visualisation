@@ -58,8 +58,12 @@ This is a client-side application with no build steps or server required.
 │   ├── vis-timeline-graph2d.min.js
 │   ├── cytoscape.min.js
 │   └── leaflet.js
+├── scripts/                    # Extra tools
+│   └── csv_to_json.py          # script to transform .xlsx to .js 
 └── source_data/
     └── leerling_meester_sourcedata.js # Contains the dataset (peopleData, travelsData, relationsData, Locations)
+    └── leerling_meester_sourcedata.xlsx # Contains the original dataset
+
 ```
 
 ## 📊 Data Format
