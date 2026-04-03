@@ -3,174 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Artists Visualization - Erfgoed Style</title>
+    <title>Leerling-Meester Netwerk Dashboard</title>
 
-    <link href="https://unpkg.com/vis-timeline@7.7.2/styles/vis-timeline-graph2d.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="styles/vis-timeline-graph2d.min.css" rel="stylesheet" />
+    <link href="styles/leaflet.css" rel="stylesheet"  type="text/css" />
+    <link href="styles/lm_style.css" rel="stylesheet" type="text/css" />
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <style>
-        /* Erfgoed Brugge Geïnspireerde Styling */
-        :root {
-            --bg-body: #fafaf9;
-            --bg-panel: #ffffff;
-            --border-light: #e7e5e4;
-            --header-grey: #e6E6E3;
-            --border-dark: #d6d3d1;
-            --text-main: #1c1917;
-            --text-muted: #57534e;
-            --accent-dark: #292524;
-            --accent-red: #EA1128;
-            --accent-red-hover: #c80d20;
-            --highlight-bg: #f5f5f4;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-        body { width: 100vw; height: 100vh; display: flex; overflow: hidden; background-color: var(--bg-body); color: var(--text-main); }
-
-        /* Left Sidebar */
-        .sidebar { width: 25%; background-color: var(--bg-panel); display: flex; flex-direction: column; border-right: 1px solid var(--border-dark); position: relative; z-index: 10; }
-        .sidebar-header { padding: 20px 15px; border-bottom: 1px solid var(--border-light); background: var(--bg-panel); display: flex; align-items: center; }
-        .sidebar-header h1 { font-size: 1.1rem; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; color: var(--text-main); }
-
-        /* Geïntegreerde Filter Styling */
-        .filter-inline { padding: 15px 15px 10px 15px; background: var(--bg-panel); border-bottom: 1px solid var(--border-light); }
-        .filter-inline input { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid var(--border-dark); border-radius: 2px; outline: none; font-size: 0.85rem; }
-        .filter-inline input:focus { border-color: var(--text-main); }
-        .filter-actions { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
-        .filter-actions a { color: var(--text-muted); cursor: pointer; text-decoration: none; transition: all 0.2s; }
-        .filter-actions a:hover { color: var(--text-main); }
-
-        .counter { padding: 10px 15px; font-size: 0.8rem; font-weight: 500; color: var(--text-muted); ; border-bottom: 1px solid var(--border-light); text-align: right; }
-
-        /* Geïntegreerde Lijst Styling */
-        .main-list { flex: 1; overflow-y: auto; list-style: none; padding: 0; }
-        .main-list li { display: flex; flex-direction: column; padding: 10px 15px; border-bottom: 1px solid var(--border-light); transition: background 0.2s; }
-        .main-list li:hover { background: var(--highlight-bg); }
-        .main-list li.focused { background: var(--highlight-bg); border-left: 4px solid var(--accent-dark); padding-left: 11px; }
-
-        .list-item-top { display: flex; align-items: center; gap: 10px; }
-        .list-item-top input[type="checkbox"] { accent-color: var(--accent-red); width: 18px; height: 18px; cursor: pointer; flex-shrink: 0; }
-        .list-item-name { flex: 1; cursor: pointer; font-size: 0.9rem; color: var(--text-main); font-weight: 500; padding: 2px 0; }
-        .variant-text { font-size: 0.75rem; color: var(--text-muted); font-style: italic; margin-left: 28px; margin-top: 2px; }
-
-        /* Data Panel (Bottom Left) */
-        .data-panel-container { height: 40vh; display: flex; flex-direction: column; background: var(--bg-panel); border-top: 1px solid var(--border-dark); box-shadow: 0 -4px 6px -1px rgba(0,0,0,0.02); }
-        .data-panel { flex: 1; overflow-y: auto; padding: 15px 20px; font-size: 0.85rem; }
-        .data-panel table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-        .data-panel th, .data-panel td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--border-light); vertical-align: top; }
-        .data-panel th { width: 35%; color: var(--text-muted); font-weight: 500; }
-
-        .action-btn { margin-top: 15px; padding: 10px 12px; background: var(--accent-dark); color: white; border: none; border-radius: 2px; cursor: pointer; width: 100%; font-weight: 500; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; transition: background 0.2s; }
-        .action-btn:hover { background: #000000; }
-
-        /* Main Content Layout */
-        .main-content { width: 75%; display: flex; flex-direction: column; position: relative; min-width: 0; background-color: var(--bg-body); }
-        .panel { display: flex; flex-direction: column; border-bottom: 1px solid var(--border-dark); background: var(--bg-panel); position: relative; min-width: 0; }
-
-        /* Herbruikbare Header */
-        .panel-header { padding: 10px 20px; background: var(--header-grey); color: var(--accent-dark); display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; flex-shrink: 0; min-height: 46px; }
-
-        .window-btn { background: transparent; border: 1px solid rgba(255,255,255,0.4); border-radius: 2px; color: var(--accent-dark); cursor: pointer; width: 26px; height: 26px; display: flex; justify-content: center; align-items: center; transition: all 0.2s; font-size: 1rem; }
-        .window-btn:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
-
-        .panel-content { flex: 1; position: relative; overflow: auto; width: 100%; height: 100%; min-height: 0; min-width: 0; }
-
-        .timeline-wrapper { flex: 1; max-height: 60vh; display: flex; flex-direction: column; min-height: 60vh; min-width: 0; transition: max-height 0.2s ease; }
-        .bottom-wrapper { flex: 1; display: flex; min-height: 0; min-width: 0; }
-        .bottom-wrapper .panel { flex: 1; border-bottom: none; border-right: 1px solid var(--border-dark); min-height: 0; min-width: 0; }
-        .bottom-wrapper .panel:last-child { border-right: none; }
-
-        /* Maximize CSS State */
-        .main-content.max-timeline .bottom-wrapper { display: none !important; }
-        .main-content.max-timeline .timeline-wrapper { max-height: 100vh !important; border-bottom: none; }
-
-        .main-content.max-network .timeline-wrapper { display: none !important; }
-        .main-content.max-network #panel-map { display: none !important; }
-        .main-content.max-network .bottom-wrapper { border-top: none; }
-
-        .main-content.max-map .timeline-wrapper { display: none !important; }
-        .main-content.max-map #panel-network { display: none !important; }
-
-        /* Vis-Timeline & Tooltips */
-        .vis-item.vis-background { background-color: rgba(41, 37, 36, 0.2); cursor: pointer; }
-        .vis-item.travel-event { background-color: var(--accent-red); border-color: var(--accent-red-hover); color: white; border-radius: 2px; font-size: 0.8rem; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
-        .vis-time-axis .vis-text { color: var(--text-muted); font-weight: 500; font-size: 0.8rem; }
-        .vis-item.vis-background.inferred-birth { background-color: transparent !important; background-image: linear-gradient(to right, transparent, #eef1fb 20%); }
-        .vis-item.vis-background.inferred-death { background-color: transparent !important; background-image: linear-gradient(to left, transparent, #eef1fb 20%); }
-        .vis-item.vis-background.inferred-both { background-color: transparent !important; background-image: linear-gradient(to right, transparent, #eef1fb 20%, #eef1fb 80%, transparent); }
-
-        .vis-tooltip { background-color: #ffffff; border: 1px solid var(--border-dark); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); border-radius: 2px; padding: 15px 20px; font-family: 'Inter', system-ui, sans-serif; font-size: 0.85rem; color: var(--text-main); z-index: 1000 !important; line-height: 1.6; max-width: 320px; }
-        .vis-tooltip strong { color: var(--accent-dark); font-weight: 600; }
-        .vis-tooltip i { color: var(--text-muted); font-size: 0.8rem; font-style: italic; }
-        .vis-tooltip .tooltip-header { font-size: 1.05rem; font-weight: 700; color: var(--accent-red); margin-bottom: 8px; border-bottom: 1px solid var(--border-light); padding-bottom: 4px; }
-        .vis-tooltip .tooltip-note { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border-light); color: var(--text-muted); }
-    </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h1>Apprentice-master network</h1>
-        </div>
+    <div class="topbar">
+        <div class="topbar-title" width="350px">Leerling-Meester Netwerk</div>
 
-        <div class="filter-inline">
-            <input type="text" id="searchInput" placeholder="Search by name, name variant or place..." onkeyup="filterList()">
-            <div class="filter-actions">
-                <a onclick="selectAll(true)">Select all</a>
-                <a onclick="selectAll(false)">Clear</a>
-            </div>
+        <div class="filters-container">
+            <div class="counter" id="selectedCounter">0 resultaten</div>
+            <div class="filter-header">Verfijn je resultaten:</div>
+            <details class="filter-dropdown" id="dropdownName">
+                <summary class="filter-btn" title="Filter op naam van een kunstenaar">Naam</summary>
+                <div class="dropdown-content">
+                    <input type="text" class="filter-search" onkeyup="searchChecklist('nameFilter', this.value)" placeholder="Zoek een naam...">
+                    <div class="filter-actions">
+                        <a onclick="checkAll('nameFilter', true)">Selecteer alles</a>
+                        <a onclick="checkAll('nameFilter', false)">Wis alles</a>
+                    </div>
+                    <ul class="checklist" id="nameFilter"></ul>
+                </div>
+            </details>
 
-        </div>
-        <div class="counter" id="selectedCounter">0 selected</div>
+            <details class="filter-dropdown" id="dropdownLoc">
+                <summary class="filter-btn" title="Filter op plaatsnaam">Plaats</summary>
+                <div class="dropdown-content">
+                    <input type="text" class="filter-search" onkeyup="searchChecklist('locFilter', this.value)" placeholder="Zoek een locatie...">
+                    <div class="filter-actions">
+                        <a onclick="checkAll('locFilter', true)">Selecteer alles</a>
+                        <a onclick="checkAll('locFilter', false)">Wis alles</a>
+                    </div>
+                    <ul class="checklist" id="locFilter"></ul>
+                </div>
+            </details>
 
-        <!--- <div class="counter" id="selectedCounter">0 selected</div> -->
-
-        <ul class="main-list" id="mainList"></ul>
-
-        <div class="data-panel-container">
-            <div class="panel-header">
-                <span>Details</span>
-            </div>
-            <div class="data-panel" id="dataPanel">
-                <i style="color: var(--text-muted);">Select an artist to view details.</i>
+            <div class="filter-slider-container">
+                <div class="filter-header" title="Gebruik de sliders om de periode te kiezen">Periode <span id="timeMinVal">1700</span> - <span id="timeMaxVal">1950</span></div>
+                <div class="slider-wrapper">
+                    <div class="slider-track"></div>
+                    <input type="range" id="timeMin" min="1700" max="1950" value="1700" oninput="updateTimeFilter()">
+                    <input type="range" id="timeMax" min="1700" max="1950" value="1950" oninput="updateTimeFilter()">
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="main-content" id="main-content">
+    <div class="dashboard-content" id="main-content">
+
         <div class="panel timeline-wrapper" id="panel-timeline">
             <div class="panel-header">
-                <span>Timeline</span>
-                <button class="window-btn" onclick="toggleMaximize('panel-timeline')" title="Maximize/Restore">＋</button>
+                <span title="Klik op een naam om in te zoomen op de tijdlijn">Tijdslijn</span>
+                <button class="window-btn" onclick="toggleMaximize('panel-timeline')" title="Maximize/Restore">🗖</button>
             </div>
+
+            <div class="nav-controls">
+                <button class="nav-btn" onclick="tlMoveLeft()" title="Naar links">◄</button>
+                <button class="nav-btn" onclick="tlMoveRight()" title="Naar rechts">►</button>
+                <div class="nav-divider"></div>
+                <button class="nav-btn" onclick="tlZoomIn()" title="Zoom in">＋</button>
+                <button class="nav-btn" onclick="tlZoomOut()" title="Zoom uit">－</button>
+                <div class="nav-divider"></div>
+                <button class="nav-btn" onclick="tlFit()" title="Maak passend">⛶</button>
+                <button class="nav-btn" onclick="tlReset()" title="Stel in op geselecteerde periode">↺</button>
+            </div>
+
             <div class="panel-content" id="timeline-container"></div>
         </div>
 
         <div class="bottom-wrapper" id="bottom-wrapper">
-            <div class="panel" id="panel-network">
+
+            <div class="panel details-panel" id="panel-details">
                 <div class="panel-header">
-                    <span>Social Network</span>
-                    <button class="window-btn" onclick="toggleMaximize('panel-network')" title="Maximize/Restore">＋</button>
+                    <span title="Gebruik de knoppen om kunstenaars of locaties aan de selectie toe te voegen of te verwijderen">Details</span>
                 </div>
+                <div class="panel-content data-panel" id="dataPanel">
+                    <i style="color: var(--text-muted);">Klik op een naam in de tijdslijn, het netwerk of de kaart om details te zien.</i>
+                </div>
+            </div>
+
+            <div class="panel network-panel" id="panel-network">
+                <div class="panel-header">
+                    <span title="Klik op een naam om details te zien">Netwerk</span>
+                    <button class="window-btn" onclick="toggleMaximize('panel-network')" title="Maximize/Restore">🗖</button>
+                </div>
+
+                <div class="nav-controls"> <button class="nav-btn" onclick="netZoomIn()" title="Zoom in">＋</button>
+                    <button class="nav-btn" onclick="netZoomOut()" title="Zoom uit">－</button>
+                    <div class="nav-divider"></div>
+                    <button class="nav-btn" onclick="netFit()" title="Maak passend">⛶</button>
+                    <button class="nav-btn" onclick="netReset()" title="Herstel">↺</button>
+                </div>
+
                 <div class="panel-content" id="network-container" style="overflow: hidden;"></div>
             </div>
-            <div class="panel" id="panel-map">
+
+            <div class="panel map-panel" id="panel-map">
                 <div class="panel-header">
-                    <span>Travel Map</span>
-                    <button class="window-btn" onclick="toggleMaximize('panel-map')" title="Maximize/Restore">＋</button>
+                    <span title="klik op een locatie om een lijst te zien">Locaties</span>
+                    <span title="klik op een locatie om een lijst te zien"> i </span>
+                    <button class="window-btn" onclick="toggleMaximize('panel-map')" title="Maximize/Restore">🗖</button>
                 </div>
                 <div class="panel-content" id="map-container" style="overflow: hidden;"></div>
             </div>
+
         </div>
     </div>
 
-    <script src="https://unpkg.com/vis-timeline@7.7.2/standalone/umd/vis-timeline-graph2d.min.js"></script>
-    <script src="https://unpkg.com/cytoscape@3.28.1/dist/cytoscape.min.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-    <script src="leerling_meester_sourcedata.js"></script>
+    <script src="libraries/vis-timeline-graph2d.min.js"></script>
+    <script src="libraries/cytoscape.min.js"></script>
+    <script src="libraries/leaflet.js"></script>
+    <script src="source_data/leerling_meester_sourcedata.js"></script>
 
     <script>
         // --- Setup & Helpers ---
@@ -178,8 +126,14 @@
 
         let selectedArtists = new Set();
         let focusedArtistId = null;
-
         let timeline, cy, map;
+
+        // Filter variabelen
+        let checkedNames = new Set();
+        let checkedLocations = new Set();
+        let artistLocMap = new Map();
+        let globalLocationVisits = {}; // NIEUW: Globale opslag voor snellere interactie
+        let timeFilterTimeout;
 
         function safeDate(dStr) {
             if (!dStr) return null;
@@ -193,171 +147,399 @@
             return null;
         }
 
+        document.addEventListener('click', function(event) {
+            const dropdowns = document.querySelectorAll('.filter-dropdown');
+            dropdowns.forEach(dropdown => {
+                if (!dropdown.contains(event.target)) {
+                    dropdown.removeAttribute('open');
+                }
+            });
+        });
+
         // --- 1. Initialization ---
         function init() {
-            peopleData.filter(p => p.level === "A").forEach(p => selectedArtists.add(p.id));
-
-            renderList();
-
+            buildFilterData();
+            buildLocationVisits(); // Genereer eenmalig de data voor klik-acties
+            buildFilterUI();
             initTimeline();
             initNetwork();
             initMap();
-
-            updateUI();
+            applyFilters();
         }
 
-        // --- 2. Sidebar Logic (Integrated) ---
-        function renderList() {
-            const list = document.getElementById('mainList');
-            list.innerHTML = '';
+        // --- 2. Data Voorbereiding voor Filters & Klik-acties ---
+        function buildFilterData() {
+            let allLocs = new Set();
 
-            let levelA = peopleData.filter(p => p.level === "A");
+            peopleData.filter(p => p.level === "A").forEach(p => {
+                let locs = new Set();
+                if (p.place_birth && p.place_birth.trim()) locs.add(p.place_birth.trim());
+                if (p.place_death && p.place_death.trim()) locs.add(p.place_death.trim());
+                artistLocMap.set(p.id, locs);
+            });
 
-            levelA.sort((a, b) => a.name.localeCompare(b.name));
-
-            levelA.forEach(person => {
-                const li = document.createElement('li');
-                li.id = `list-item-${person.id}`;
-
-                li.dataset.name = person.name.toLowerCase();
-                li.dataset.variants = (person.variants || []).join(" ").toLowerCase();
-
-                let artistLocs = [];
-                travelsData.filter(t => t.artist_id === person.id).forEach(t => {
-                    if (t.location) artistLocs.push(t.location.toLowerCase());
+            travelsData.forEach(t => {
+                if (artistLocMap.has(t.artist_id)) {
+                    let locs = artistLocMap.get(t.artist_id);
+                    if (t.location && t.location.trim()) locs.add(t.location.trim());
                     if (t.secondary_locations) {
-                        t.secondary_locations.forEach(sl => artistLocs.push(sl.toLowerCase()));
+                        t.secondary_locations.forEach(l => { if (l && l.trim()) locs.add(l.trim()); });
                     }
-                });
-                li.dataset.locations = [...new Set(artistLocs)].join(" ");
+                }
+            });
 
-                li.innerHTML = `
-                    <div class="list-item-top">
-                        <input type="checkbox" value="${person.id}" checked onchange="toggleSelection('${person.id}')">
-                        <span class="list-item-name" onclick="setFocus('${person.id}')">${person.name}</span>
-                    </div>
-                `;
-                list.appendChild(li);
+            artistLocMap.forEach((locs, id) => {
+                if (locs.size === 0) locs.add("Unknown");
+                locs.forEach(l => allLocs.add(l));
+            });
+
+            window.allSortedLocations = Array.from(allLocs).sort();
+        }
+
+        // Bereken alle bezoeken één keer, zodat zowel Map als Tijdlijn dit supersnel kunnen gebruiken
+        function buildLocationVisits() {
+            globalLocationVisits = {};
+            peopleData.filter(p => p.level === "A").forEach(p => {
+                let pb = p.place_birth ? p.place_birth.trim() : null;
+                if(pb && locDict[pb]) {
+                    if(!globalLocationVisits[pb]) globalLocationVisits[pb] = [];
+                    globalLocationVisits[pb].push({ id: p.id, name: p.name, time: `Geboren ${p.birth || '?'}` });
+                }
+            });
+
+            travelsData.forEach(t => {
+                let loc = t.location ? t.location.trim() : null;
+                if(loc && locDict[loc]) {
+                    const person = peopleData.find(p => p.id === t.artist_id && p.level === "A");
+                    if(person) {
+                        if(!globalLocationVisits[loc]) globalLocationVisits[loc] = [];
+                        let tStart = t.start || '?';
+                        let tEnd = t.end || '?';
+                        let timeStr = (tStart !== '?' || tEnd !== '?') ? `${tStart} - ${tEnd}` : '?';
+                        globalLocationVisits[loc].push({ id: person.id, name: person.name, time: timeStr });
+                    }
+                }
             });
         }
 
-        function filterList() {
-            const term = document.getElementById('searchInput').value.toLowerCase();
-            const items = document.querySelectorAll('#mainList li');
+        // --- 3. UI Bouwen voor Filters ---
+        function buildFilterUI() {
+            const nameListEl = document.getElementById('nameFilter');
+            peopleData.filter(p => p.level === "A").sort((a,b) => a.name.localeCompare(b.name)).forEach(p => {
+                checkedNames.add(p.id);
 
+                let li = document.createElement('li');
+                li.dataset.search = `${p.name} ${p.variants ? p.variants.join(' ') : ''}`.toLowerCase();
+
+                let cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.value = p.id;
+                cb.checked = true;
+                cb.onchange = function() { toggleIndividualFilter('nameFilter', this.value, this.checked); };
+
+                let span = document.createElement('span');
+                span.innerText = p.name;
+
+                li.appendChild(cb);
+                li.appendChild(span);
+                nameListEl.appendChild(li);
+            });
+
+            const locListEl = document.getElementById('locFilter');
+            window.allSortedLocations.forEach(loc => {
+                checkedLocations.add(loc);
+
+                let li = document.createElement('li');
+                li.dataset.search = loc.toLowerCase();
+
+                let cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.value = loc;
+                cb.checked = true;
+                cb.onchange = function() { toggleIndividualFilter('locFilter', this.value, this.checked); };
+
+                let span = document.createElement('span');
+                span.innerText = loc;
+
+                li.appendChild(cb);
+                li.appendChild(span);
+                locListEl.appendChild(li);
+            });
+        }
+
+        // --- 4. Faceted Filtering Logica ---
+        function searchChecklist(filterId, term) {
+            term = term.toLowerCase();
+            const items = document.querySelectorAll(`#${filterId} li`);
             items.forEach(li => {
-                const matchesName = li.dataset.name.includes(term);
-                const matchesVariant = li.dataset.variants.includes(term);
-                const matchesLocation = li.dataset.locations.includes(term);
-
-                const matches = matchesName || matchesVariant || matchesLocation;
-                li.style.display = matches ? 'flex' : 'none';
-
-                let vSpan = li.querySelector('.variant-text');
-
-                if (term && matches && !matchesName) {
-                    if (!vSpan) {
-                        vSpan = document.createElement('div');
-                        vSpan.className = 'variant-text';
-                        li.appendChild(vSpan);
-                    }
-                    if (matchesVariant) {
-                        vSpan.innerText = `(aka variant)`;
-                    } else if (matchesLocation) {
-                        vSpan.innerText = `(visited place)`;
-                    }
+                if (li.dataset.search.includes(term)) {
+                    li.classList.remove('search-hidden');
                 } else {
-                    if (vSpan) vSpan.remove();
+                    li.classList.add('search-hidden');
                 }
             });
         }
 
-        function updateListStatus() {
-            document.getElementById('selectedCounter').innerText = `${selectedArtists.size} selected`;
+        function toggleIndividualFilter(filterId, value, isChecked, apply = true) {
+            const targetSet = filterId === 'nameFilter' ? checkedNames : checkedLocations;
+            if(isChecked) targetSet.add(value);
+            else targetSet.delete(value);
+            if(apply) applyFilters();
+        }
 
-            const items = document.querySelectorAll('#mainList li');
+        function checkAll(filterId, isChecked) {
+            const items = document.querySelectorAll(`#${filterId} li`);
             items.forEach(li => {
-                const id = li.id.replace('list-item-', '');
-                const checkbox = li.querySelector('input[type="checkbox"]');
-                if (checkbox) checkbox.checked = selectedArtists.has(id);
+                if (!li.classList.contains('search-hidden') && !li.classList.contains('facet-hidden')) {
+                    const cb = li.querySelector('input[type="checkbox"]');
+                    cb.checked = isChecked;
+                    const targetSet = filterId === 'nameFilter' ? checkedNames : checkedLocations;
+                    if(isChecked) targetSet.add(cb.value);
+                    else targetSet.delete(cb.value);
+                }
+            });
+            applyFilters();
+        }
 
-                if (focusedArtistId === id) li.classList.add('focused');
-                else li.classList.remove('focused');
+        function updateTimeFilter() {
+            let minEl = document.getElementById('timeMin');
+            let maxEl = document.getElementById('timeMax');
+            let minVal = parseInt(minEl.value);
+            let maxVal = parseInt(maxEl.value);
+
+            if (minVal > maxVal) {
+                if (document.activeElement.id === 'timeMin') { minEl.value = maxVal; minVal = maxVal; }
+                else { maxEl.value = minVal; maxVal = minVal; }
+            }
+
+            document.getElementById('timeMinVal').innerText = minVal;
+            document.getElementById('timeMaxVal').innerText = maxVal;
+
+            clearTimeout(timeFilterTimeout);
+            timeFilterTimeout = setTimeout(applyFilters, 150);
+        }
+
+        function matchesTime(p, minYear, maxYear) {
+            let bYear = p.birth ? parseInt(safeDate(p.birth).substring(0,4)) : null;
+            let dYear = p.death ? parseInt(safeDate(p.death).substring(0,4)) : null;
+            let travelYears = travelsData.filter(t => t.artist_id === p.id).map(t => parseInt(safeDate(t.start)?.substring(0,4))).filter(y => !isNaN(y));
+
+            if(!bYear && travelYears.length > 0) bYear = Math.min(...travelYears) - 15;
+            if(!dYear && travelYears.length > 0) dYear = Math.max(...travelYears) + 15;
+
+            let pStart = bYear || 1700;
+            let pEnd = dYear || 1950;
+            return (pStart <= maxYear && pEnd >= minYear);
+        }
+
+        function matchesLocation(p, activeLocationsSet) {
+            let pLocs = artistLocMap.get(p.id);
+            return [...pLocs].some(l => activeLocationsSet.has(l));
+        }
+
+        function matchesName(p, activeNamesSet) {
+            return activeNamesSet.has(p.id);
+        }
+
+        function updateFacetUI(filterId, validSet) {
+            const items = document.querySelectorAll(`#${filterId} li`);
+            items.forEach(li => {
+                const cb = li.querySelector('input[type="checkbox"]');
+                if (validSet.has(cb.value)) {
+                    li.classList.remove('facet-hidden');
+                } else {
+                    li.classList.add('facet-hidden');
+                }
             });
         }
 
-        function toggleSelection(id) {
-            if (selectedArtists.has(id)) selectedArtists.delete(id);
-            else selectedArtists.add(id);
+        function applyFilters() {
+            let minYear = parseInt(document.getElementById('timeMin').value);
+            let maxYear = parseInt(document.getElementById('timeMax').value);
 
-            updateUI();
-            if (focusedArtistId === id) updateDataPanel(id);
-        }
+            let validNamesForFacet = new Set();
+            let validLocsForFacet = new Set();
+            selectedArtists.clear();
 
-        function selectAll(check) {
-            const checkboxes = document.querySelectorAll('#mainList input[type="checkbox"]');
-            checkboxes.forEach(cb => {
-                const li = cb.closest('li');
-                if(li.style.display !== 'none') {
-                    if(check) selectedArtists.add(cb.value);
-                    else selectedArtists.delete(cb.value);
+            peopleData.filter(p => p.level === "A").forEach(p => {
+                let timeMatch = matchesTime(p, minYear, maxYear);
+                let locMatch = matchesLocation(p, checkedLocations);
+                let nameMatch = matchesName(p, checkedNames);
+
+                if (timeMatch && locMatch) validNamesForFacet.add(p.id);
+                if (timeMatch && nameMatch) {
+                    let pLocs = artistLocMap.get(p.id);
+                    pLocs.forEach(l => validLocsForFacet.add(l));
+                }
+
+                if (timeMatch && locMatch && nameMatch) {
+                    selectedArtists.add(p.id);
                 }
             });
 
+            updateFacetUI('nameFilter', validNamesForFacet);
+            updateFacetUI('locFilter', validLocsForFacet);
+
+            document.getElementById('selectedCounter').innerText = `${selectedArtists.size} kunstenaars geselecteerd`;
+
             updateUI();
-            if (focusedArtistId) updateDataPanel(focusedArtistId);
         }
 
+        // --- 5A. Data Paneel (Artist Details) ---
         function updateDataPanel(id) {
+            const panelHeader = document.querySelector('#panel-details .panel-header span');
+            if (panelHeader) panelHeader.innerText = 'Details';
+
             const panel = document.getElementById('dataPanel');
             const p = peopleData.find(x => x.id === id);
             if (!p) return;
 
             let tableHtml = '<table>';
-            tableHtml += `<tr><th>Name</th><td>${p.name}</td></tr>`;
+            tableHtml += `<center><h2>${p.name}</h2></center>`;
 
             if (p.variants && p.variants.length > 0) {
-                tableHtml += `<tr><th>Variants</th><td>${p.variants.join(',<br>')}</td></tr>`;
+                tableHtml += `<tr><th>naamsvarianten</th><td>${p.variants.join('; ')}</td></tr>`;
             }
 
             if (p.birth || p.place_birth) {
                 let bStr = `${p.birth || '?'} (${p.place_birth || '?'})`;
                 if (p.data_of_birth_prec) bStr += ` <br><small><i>${p.data_of_birth_prec}</i></small>`;
-                tableHtml += `<tr><th>Birth</th><td>${bStr}</td></tr>`;
+                tableHtml += `<tr><th>geboren</th><td>${bStr}</td></tr>`;
             }
 
             if (p.death || p.place_death) {
                 let dStr = `${p.death || '?'} (${p.place_death || '?'})`;
                 if (p.date_of_death_prec) dStr += ` <br><small><i>${p.date_of_death_prec}</i></small>`;
-                tableHtml += `<tr><th>Death</th><td>${dStr}</td></tr>`;
+                tableHtml += `<tr><th>overleden</th><td>${dStr}</td></tr>`;
             }
 
             if (p.profession && p.profession.length > 0) {
-                tableHtml += `<tr><th>Occupation</th><td>${p.profession.join(', ')}</td></tr>`;
+                tableHtml += `<tr><th>beroep</th><td>${p.profession.join(', ')}</td></tr>`;
             }
 
             if (p.nationality) {
-                tableHtml += `<tr><th>Nationality</th><td>${p.nationality}</td></tr>`;
+                tableHtml += `<tr><th>nationaliteit</th><td>${p.nationality}</td></tr>`;
             }
 
             if (p.biographical_note) {
-                tableHtml += `<tr><th>Note</th><td>${p.biographical_note}</td></tr>`;
+                tableHtml += `<tr><th>opmerking</th><td>${p.biographical_note}</td></tr>`;
             }
 
             if (p.RKDartist_id && p.RKDartist_id !== "none" && p.RKDartist_id.trim() !== "") {
-                tableHtml += `<tr><th>RKD Link</th><td><a href="https://rkd.nl/artists/${p.RKDartist_id}" target="_blank" style="color: var(--accent-red); font-weight:500;">${p.RKDartist_id}</a></td></tr>`;
+                tableHtml += `<tr><th>RKD link</th><td><a href="https://rkd.nl/artists/${p.RKDartist_id}" target="_blank" style="color: var(--accent-red); font-weight:500;">${p.RKDartist_id}</a></td></tr>`;
             }
 
             tableHtml += '</table>';
-            panel.innerHTML = tableHtml;
 
-            if(p.level === "A" && !selectedArtists.has(id)) {
-                panel.innerHTML += `<button class="action-btn" onclick="toggleSelection('${id}')">＋ Add to selection</button>`;
+            if (p.level === "A") {
+                const isInSelection = selectedArtists.has(id);
+                const btnText = isInSelection ? "Verwijder uit selectie" : "Voeg toe aan selectie";
+                const btnClass = isInSelection ? "action-btn remove-btn" : "action-btn add-btn";
+
+                let inlineStyle = "margin-top: 15px; width: 100%; padding: 10px 12px; border: 1px solid var(--border-dark); border-radius: 4px; cursor: pointer; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; transition: all 0.2s;";
+                if(isInSelection) {
+                    inlineStyle += " background: var(--highlight-bg); color: var(--text-muted);";
+                } else {
+                    inlineStyle += " background: var(--accent-dark); color: white;";
+                }
+
+                tableHtml += `<button class="${btnClass}" style="${inlineStyle}" onclick="toggleArtistSelection('${id}')">${btnText}</button>`;
             }
+
+            panel.innerHTML = tableHtml;
         }
 
-        // --- 3. Visualizations ---
+        function toggleArtistSelection(id) {
+            const isCurrentlySelected = selectedArtists.has(id);
+            const newState = !isCurrentlySelected;
 
+            if (newState) {
+                checkedNames.add(id);
+                let pLocs = artistLocMap.get(id);
+                if (pLocs) {
+                    pLocs.forEach(l => checkedLocations.add(l));
+                }
+            } else {
+                checkedNames.delete(id);
+            }
+
+            const cbName = document.querySelector(`#nameFilter input[value="${id}"]`);
+            if (cbName) cbName.checked = newState;
+
+            if (newState) {
+                const locItems = document.querySelectorAll(`#locFilter input[type="checkbox"]`);
+                locItems.forEach(cb => {
+                    if(checkedLocations.has(cb.value)) cb.checked = true;
+                });
+            }
+
+            applyFilters();
+            updateDataPanel(id);
+        }
+
+        // --- 5B. Location Paneel (Map & Tijdlijn Klik Info) ---
+        function updateLocationPanel(city, visits) {
+            const panelHeader = document.querySelector('#panel-details .panel-header span');
+            if (panelHeader) panelHeader.innerText = 'Locatie details';
+
+            const panel = document.getElementById('dataPanel');
+
+            let html = `<center><h2>${city}</h2></center>`;
+            html += `<table style="margin-top: 10px;"><tr><th style="padding-bottom:8px;">Naam</th><th style="padding-bottom:8px;">Periode</th></tr>`;
+
+            const seen = new Set();
+            const uniqueVisits = visits.filter(v => {
+                const key = v.name + '|' + v.time;
+                if(seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
+
+            uniqueVisits.forEach(v => {
+                const isSelected = selectedArtists.has(v.id);
+                const color = isSelected ? 'var(--text-main)' : 'var(--text-muted)';
+                const weight = isSelected ? '400' : '200';
+                const opacity = isSelected ? '1' : '0.6';
+
+                html += `<tr style="color: ${color}; font-weight: ${weight}; opacity: ${opacity}; cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity='${opacity}'" onclick="setFocus('${v.id}')">
+                            <td style="padding: 4px 4px; border-bottom: 1px dashed var(--border-light);">${v.name}</td>
+                            <td style="padding: 4px 4px; border-bottom: 1px dashed var(--border-light);">${v.time === '?' ? 'onbekend' : v.time}</td>
+                         </tr>`;
+            });
+            html += `</table>`;
+
+            let inlineStyle = "margin-top: 20px; width: 100%; padding: 10px 12px; background: var(--accent-dark); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;";
+            html += `<button class="action-btn add-btn" style="${inlineStyle}" onclick="filterByLocation('${city}')">Filter op deze locatie</button>`;
+
+            panel.innerHTML = html;
+        }
+
+        function filterByLocation(city) {
+            checkedLocations.clear();
+            checkedLocations.add(city);
+
+            const locItems = document.querySelectorAll(`#locFilter input[type="checkbox"]`);
+            locItems.forEach(cb => {
+                cb.checked = (cb.value === city);
+            });
+
+            checkedNames.clear();
+            peopleData.filter(p => p.level === "A").forEach(p => {
+                let pLocs = artistLocMap.get(p.id);
+                if (pLocs && pLocs.has(city)) {
+                    checkedNames.add(p.id);
+                }
+            });
+
+            const nameItems = document.querySelectorAll(`#nameFilter input[type="checkbox"]`);
+            nameItems.forEach(cb => {
+                cb.checked = checkedNames.has(cb.value);
+            });
+
+            applyFilters();
+        }
+
+        // --- 6. Visualizations ---
         function initTimeline() {
             const container = document.getElementById('timeline-container');
             const options = {
@@ -365,12 +547,39 @@
                 orientation: 'top',
                 margin: { item: 10, axis: 5 },
                 tooltip: { followMouse: true },
-                zoomKey: 'ctrlKey'
+                zoomKey: 'ctrlKey',
+                height: '100%',
+                verticalScroll: true
             };
             timeline = new vis.Timeline(container, new vis.DataSet([]), new vis.DataSet([]), options);
 
             timeline.on('click', function (properties) {
-                if (properties.group) setFocus(properties.group);
+                const isTravelItem = properties.item && properties.item.startsWith('t_');
+
+                // Focus op de kunstenaar ALLEEN als er NIET op een specifieke locatie/reis is geklikt
+                if (properties.group && !isTravelItem) {
+                    setFocus(properties.group, false);
+                }
+
+                // Als er wel op een reis is geklikt, toon de locatiedetails (zoals bij de kaart)
+                if (isTravelItem) {
+                    const eventId = properties.item.substring(2);
+                    const travelEvent = travelsData.find(t => t.event_id === eventId);
+
+                    if (travelEvent && travelEvent.location && locDict[travelEvent.location]) {
+                        const city = travelEvent.location.trim();
+                        const coords = locDict[city];
+
+                        // 1. Zoom de kaart
+                        if (map) {
+                            map.setView([coords.lat, coords.lon], 8, { animate: true, duration: 1 });
+                        }
+
+                        // 2. Open het locatie detail paneel
+                        const visits = globalLocationVisits[city] || [];
+                        updateLocationPanel(city, visits);
+                    }
+                }
             });
         }
 
@@ -383,9 +592,10 @@
                 .sort((a, b) => a.name.localeCompare(b.name));
 
             sortedArtists.forEach((person, index) => {
+                let isFocused = person.id === focusedArtistId;
                 groups.add({
                     id: person.id,
-                    content: `<span id="tl-group-${person.id}">${person.name}</span>`,
+                    content: `<span id="tl-group-${person.id}" class="${isFocused ? 'focused-group' : ''}">${person.name}</span>`,
                     order: index
                 });
 
@@ -408,22 +618,22 @@
 
                 if (bYear && dYear) {
                     infClass = '';
-                    hoverText = `<div class="tooltip-header">Lifespan</div><strong>${bYear} - ${dYear}</strong>`;
+                    hoverText = `<div class="tooltip-header">Levensduur</div><strong>${bYear} - ${dYear}</strong>`;
                 } else if (bYear && !dYear) {
                     let endExt = maxTravelYear ? Math.max(bYear + 70, maxTravelYear + 5) : bYear + 70;
                     inferredEnd = `${endExt}-12-31`;
                     infClass = 'inferred-death';
-                    hoverText = `<div class="tooltip-header">Lifespan</div><strong>${bYear} - ?</strong><br><i>* Death date inferred from travel activity or general age limit.</i>`;
+                    hoverText = `<div class="tooltip-header">Levensduur</div><strong>${bYear} - ?</strong><br><i>* Overlijdensdatum onzeker: afgeleid van reisgegevens of levensverwachting.</i>`;
                 } else if (!bYear && dYear) {
                     let startExt = minTravelYear ? Math.min(dYear - 70, minTravelYear - 5) : dYear - 70;
                     inferredStart = `${startExt}-01-01`;
                     infClass = 'inferred-birth';
-                    hoverText = `<div class="tooltip-header">Lifespan</div><strong>? - ${dYear}</strong><br><i>* Birth date inferred from travel activity or general age limit.</i>`;
+                    hoverText = `<div class="tooltip-header">Levensduur</div><strong>? - ${dYear}</strong><br><i>* Geboortedatum onzeker: afgeleid van reisgegevens of levensverwachting.</i>`;
                 } else if (!bYear && !dYear && minTravelYear && maxTravelYear) {
                     inferredStart = `${minTravelYear - 15}-01-01`;
                     inferredEnd = `${maxTravelYear + 15}-12-31`;
                     infClass = 'inferred-both';
-                    hoverText = `<div class="tooltip-header">Lifespan</div><strong>? - ?</strong><br><i>* Both dates inferred based on known active travel years.</i>`;
+                    hoverText = `<div class="tooltip-header">Levensduur</div><strong>? - ?</strong><br><i>* Geboorte- en Overlijdensdatum onzeker: afgeleid van reisgegevens.</i>`;
                 }
 
                 if (inferredStart && inferredEnd) {
@@ -441,38 +651,99 @@
                 personTravels.forEach(t => {
                     let tStart = safeDate(t.start);
                     let tEnd = safeDate(t.end);
-                    if (!tStart) return;
-                    if (!tEnd) tEnd = tStart;
+                    let cDates = t.confirmed_date || [];
+                    let hasConfirmed = cDates.length > 0;
+
+                    function adjustYear(dateStr, offsetYears) {
+                        if (!dateStr) return null;
+                        let match = dateStr.match(/^(\d{4})(.*)$/);
+                        if (match) {
+                            return `${parseInt(match[1]) + offsetYears}${match[2]}`;
+                        }
+                        return dateStr;
+                    }
+
+                    let sortedConfirmedY = [];
+                    if (hasConfirmed) {
+                        sortedConfirmedY = cDates.map(d => {
+                            let match = d.match(/\b(\d{4})\b/);
+                            return match ? parseInt(match[1]) : 0;
+                        }).filter(y => y > 0).sort((a,b) => a - b);
+                    }
+
+                    if (!tStart && !tEnd && !hasConfirmed) return;
+
+                    let itemStart = tStart;
+                    let itemEnd = tEnd;
+                    let itemClass = 'travel-event';
+                    let isPoint = false;
+
+                    if (tStart && tEnd) {
+                        if (tStart === tEnd) isPoint = true;
+                    }
+                    else if (tStart && !tEnd) {
+                        if (hasConfirmed && sortedConfirmedY.length > 0) {
+                            let lastY = sortedConfirmedY[sortedConfirmedY.length - 1];
+                            itemEnd = `${lastY + 2}-01-01`;
+                            itemClass += ' fade-out';
+                        } else {
+                            itemEnd = adjustYear(tStart, 2);
+                            itemClass += ' fade-out';
+                        }
+                    }
+                    else if (!tStart && tEnd) {
+                        if (hasConfirmed && sortedConfirmedY.length > 0) {
+                            let firstY = sortedConfirmedY[0];
+                            itemStart = `${firstY - 2}-01-01`;
+                            itemClass += ' fade-in';
+                        } else {
+                            itemStart = adjustYear(tEnd, -2);
+                            itemClass += ' fade-in';
+                        }
+                    }
+                    else if (!tStart && !tEnd && hasConfirmed) {
+                        let firstY = sortedConfirmedY[0];
+                        let lastY = sortedConfirmedY[sortedConfirmedY.length - 1];
+                        itemStart = `${firstY - 1}-01-01`;
+                        itemEnd = `${lastY + 1}-12-31`;
+                        itemClass += ' fade-both';
+                    }
 
                     let titleHtml = `<div class="tooltip-header">${t.location}</div>`;
                     if (t.secondary_locations && t.secondary_locations.length > 0) {
-                        titleHtml += `<strong>Secondary:</strong> ${t.secondary_locations.join(', ')}<br>`;
+                        titleHtml += `secundair: ${t.secondary_locations.join(', ')}<br>`;
                     }
 
-                    let startStr = t.start;
-                    if (t.start_date_prec) startStr += ` <i>(${t.start_date_prec})</i>`;
-                    titleHtml += `<strong>From:</strong> ${startStr}<br>`;
+                    if (t.start) {
+                        let startStr = t.start;
+                        if (t.start_date_prec) startStr += ` <i>(${t.start_date_prec})</i>`;
+                        titleHtml += `begin: ${startStr}<br>`;
+                    }
 
                     if (t.end) {
                         let endStr = t.end;
                         if (t.end_date_prec) endStr += ` <i>(${t.end_date_prec})</i>`;
-                        titleHtml += `<strong>To:</strong> ${endStr}<br>`;
+                        titleHtml += `einde ${endStr}<br>`;
+                    }
+
+                    if ((!t.start || !t.end) && hasConfirmed) {
+                        titleHtml += `gekende data: ${cDates.join(', ')}<br>`;
                     }
 
                     if (t.financial_means_of_travel && t.financial_means_of_travel.trim() !== '' && t.financial_means_of_travel !== 'unknown') {
-                        titleHtml += `<strong>Financing:</strong> ${t.financial_means_of_travel}<br>`;
+                        titleHtml += `financiering: ${t.financial_means_of_travel}<br>`;
                     }
 
                     if (t.event_note && t.event_note.trim() !== '') {
-                        titleHtml += `<div class="tooltip-note"><strong>Note:</strong> ${t.event_note}</div>`;
+                        titleHtml += `<div class="tooltip-note">opmerking: ${t.event_note}</div>`;
                     }
 
                     items.add({
                         id: `t_${t.event_id}`, group: person.id,
-                        start: tStart, end: tStart !== tEnd ? tEnd : undefined,
+                        start: itemStart, end: isPoint ? undefined : itemEnd,
                         content: `${t.location}`,
-                        type: tStart === tEnd ? 'point' : 'range',
-                        className: 'travel-event',
+                        type: isPoint ? 'point' : 'range',
+                        className: itemClass,
                         title: titleHtml
                     });
                 });
@@ -487,17 +758,17 @@
                 container: document.getElementById('network-container'),
                 style: [
                     { selector: 'node', style: {
-                        'label': 'data(name)', 'font-size': '10px', 'text-valign': 'bottom', 'text-margin-y': 5,
+                        'label': 'data(name)', 'font-size': '6px', 'text-valign': 'bottom', 'text-margin-y': 5,
                         'background-color': '#d6d3d1', 'opacity': 0.2, 'width': 'data(size)', 'height': 'data(size)', 'font-family': 'Inter, sans-serif'
                     }},
                     { selector: 'edge', style: {
-                        'width': 1.5, 'line-color': '#e7e5e4', 'target-arrow-color': '#e7e5e4',
-                        'target-arrow-shape': 'triangle', 'curve-style': 'bezier', 'opacity': 0.3
+                        'width': 0.8, 'line-color': '#e7e5e4', 'source-arrow-color': '#e7e5e4',
+                        'source-arrow-shape': 'triangle', 'curve-style': 'bezier', 'opacity': 0.2, 'font-size': '4px'
                     }},
                     { selector: '.selected', style: { 'background-color': '#ea1128', 'opacity': 1, 'color': '#1c1917', 'font-weight': 'bold' } },
                     { selector: '.connected', style: { 'background-color': '#ea1128', 'opacity': 0.4 } },
                     { selector: '.focused', style: { 'border-width': 4, 'border-color': '#292524', 'opacity': 1 } },
-                    { selector: 'edge.active', style: { 'line-color': '#fca5a5', 'target-arrow-color': '#fca5a5', 'opacity': 0.8, 'label': 'data(type)', 'font-size': '8px', 'text-rotation': 'autorotate', 'color': '#57534e' } }
+                    { selector: 'edge.active', style: { 'line-color': '#fca5a5', 'source-arrow-color': '#fca5a5', 'opacity': 0.8, 'label': 'data(type)', 'font-size': '4px', 'text-rotation': 'autorotate', 'color': '#57534e' } }
                 ],
                 layout: { name: 'cose', padding: 15 }
             });
@@ -513,36 +784,53 @@
             const validNodeIds = new Set(peopleData.map(p => p.id));
 
             peopleData.forEach(p => {
-                nodeMap.set(p.id, { data: { id: p.id, name: p.name, size: 20 }, classes: '' });
+                nodeMap.set(p.id, {
+                    data: { id: p.id, name: p.name, size: 10 },
+                    classes: selectedArtists.has(p.id) ? 'selected' : ''
+                });
             });
 
             relationsData.forEach((r, index) => {
                 if(r.source && r.target && validNodeIds.has(r.source) && validNodeIds.has(r.target)) {
                     let relId = r.relation_id || `edge_${index}`;
-                    elements.push({ data: { id: relId, source: r.source, target: r.target, type: (r.type || []).join(', ') }});
+                    elements.push({
+                        data: { id: relId, source: r.source, target: r.target, type: (r.type || []).join(', ') }
+                    });
 
-                    nodeMap.get(r.source).data.size += 0.5;
-                    nodeMap.get(r.target).data.size += 0.5;
+                    if(nodeMap.has(r.source)) nodeMap.get(r.source).data.size += 1;
+                    if(nodeMap.has(r.target)) nodeMap.get(r.target).data.size += 1;
                 }
             });
 
             peopleData.forEach(p => {
                 let n = nodeMap.get(p.id);
-                if (selectedArtists.has(p.id)) {
-                    n.classes = 'selected';
-                } else {
+                if (!selectedArtists.has(p.id)) {
                     let isConnected = relationsData.some(r =>
                         (r.source === p.id && selectedArtists.has(r.target)) ||
                         (r.target === p.id && selectedArtists.has(r.source))
                     );
                     if(isConnected) n.classes = 'connected';
                 }
+
+                if (p.id === focusedArtistId) {
+                    n.classes += ' focused';
+                }
+
                 elements.push(n);
             });
 
             cy.elements().remove();
             cy.add(elements);
-            cy.layout({ name: 'cose', nodeRepulsion: 4000, idealEdgeLength: 100 }).run();
+
+            cy.layout({
+                name: 'cose',
+                componentSpacing: 100,
+                nodeOverlap: 20,
+                refresh: 20,
+                fit: true,
+                padding: 30,
+                randomize: false
+            }).run();
 
             cy.edges().forEach(e => {
                 if(selectedArtists.has(e.source().id()) || selectedArtists.has(e.target().id())) {
@@ -561,132 +849,111 @@
         function updateMap() {
             map.eachLayer(layer => { if(layer instanceof L.Marker) map.removeLayer(layer); });
 
-            const locationVisits = {};
-
+            const activeCities = new Set();
             peopleData.filter(p => selectedArtists.has(p.id)).forEach(p => {
-                if(p.place_birth && locDict[p.place_birth]) {
-                    if(!locationVisits[p.place_birth]) locationVisits[p.place_birth] = [];
-                    // ORIGINELE DATA TONEN OP DE KAART
-                    locationVisits[p.place_birth].push(`${p.name} (Born ${p.birth || '?'})`);
-                }
+                if(p.place_birth && locDict[p.place_birth]) activeCities.add(p.place_birth.trim());
             });
-
             travelsData.filter(t => selectedArtists.has(t.artist_id)).forEach(t => {
-                if(t.location && locDict[t.location]) {
-                    const person = peopleData.find(p => p.id === t.artist_id);
-                    if(person) {
-                        if(!locationVisits[t.location]) locationVisits[t.location] = [];
-                        // ORIGINELE DATA TONEN OP DE KAART
-                        let tStart = t.start || '?';
-                        let tEnd = t.end || '?';
-                        if (tStart !== '?' || tEnd !== '?') {
-                            locationVisits[t.location].push(`${person.name} (${tStart} - ${tEnd})`);
-                        } else {
-                            locationVisits[t.location].push(`${person.name}`);
-                        }
-                    }
-                }
+                if(t.location && locDict[t.location]) activeCities.add(t.location.trim());
             });
 
             const bounds = [];
-            for (const [city, visits] of Object.entries(locationVisits)) {
+            activeCities.forEach(city => {
                 const coords = locDict[city];
                 const marker = L.marker([coords.lat, coords.lon]).addTo(map);
 
-                const uniqueVisits = [...new Set(visits)];
-                // Inline HTML styling (Leaflet proof)
+                // Gebruik de pre-berekende bezoeken array
+                const visits = globalLocationVisits[city] || [];
+
+                const uniqueVisitsStrings = [...new Set(visits.map(v => v.time === '?' ? v.name : `${v.name} (${v.time})`))];
                 const tooltipHtml = `
                     <div style="font-family: 'Inter', sans-serif; font-size: 0.85rem; color: #1c1917; line-height: 1.5;">
                         <div style="font-size: 1.05rem; font-weight: 700; color: #EA1128; margin-bottom: 6px; border-bottom: 1px solid #e7e5e4; padding-bottom: 4px;">${city}</div>
-                        ${uniqueVisits.join('<br>')}
+                        ${uniqueVisitsStrings.join('<br>')}
                     </div>`;
                 marker.bindTooltip(tooltipHtml);
                 bounds.push([coords.lat, coords.lon]);
-            }
+
+                marker.on('click', function(e) {
+                    map.setView([coords.lat, coords.lon], 8, { animate: true, duration: 1 });
+                    updateLocationPanel(city, visits);
+                });
+            });
 
             if(bounds.length > 0) map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
         }
 
-        // --- 4. Focus Logic ---
-        function setFocus(artistId) {
+        // --- 7. Focus Logic ---
+        function setFocus(artistId, skipZooming = false) {
             focusedArtistId = artistId;
             updateDataPanel(artistId);
-            updateListStatus();
 
-            const p = peopleData.find(x => x.id === artistId);
+            document.querySelectorAll('[id^="tl-group-"]').forEach(el => el.classList.remove('focused-group'));
+            const activeGroup = document.getElementById(`tl-group-${artistId}`);
+            if (activeGroup) activeGroup.classList.add('focused-group');
 
-            const listItem = document.getElementById(`list-item-${artistId}`);
-            if(listItem) listItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (cy) {
+                cy.nodes().removeClass('focused');
+                const node = cy.getElementById(artistId);
+                if(node.length > 0) {
+                    node.addClass('focused');
+                    cy.animate({ zoom: 1.5, center: { eles: node } }, { duration: 500 });
+                }
+            }
 
-            if(p) {
-                let bYear = p.birth ? parseInt(safeDate(p.birth).substring(0,4)) : null;
-                let dYear = p.death ? parseInt(safeDate(p.death).substring(0,4)) : null;
+            if (!skipZooming) {
+                if (timeline) {
+                    const allItems = timeline.itemsData.get();
+                    const artistItemIds = allItems
+                        .filter(item => item.group === artistId && item.type !== 'background')
+                        .map(item => item.id);
 
-                if (!bYear || !dYear) {
-                    const travels = travelsData.filter(t => t.artist_id === artistId);
-                    const years = travels.map(t => parseInt(safeDate(t.start)?.substring(0,4))).filter(y => !isNaN(y));
-                    if (years.length > 0) {
-                        if (!bYear) bYear = Math.min(...years) - 20;
-                        if (!dYear) dYear = Math.max(...years) + 20;
+                    if (artistItemIds.length > 0) {
+                        try {
+                            timeline.focus(artistItemIds, {
+                                animation: { duration: 800, easingFunction: 'easeInOutQuad' }
+                            });
+                        } catch(e) {
+                            console.warn("Timeline kon niet focussen:", e);
+                        }
                     }
                 }
 
-                if (!bYear && !dYear) {
-                    timeline.setWindow('1700-01-01', '1850-12-31');
-                } else {
-                    if (!bYear) bYear = dYear - 70;
-                    if (!dYear) dYear = bYear + 70;
-                    timeline.setWindow(`${bYear - 10}-01-01`, `${dYear + 10}-12-31`);
+                const p = peopleData.find(x => x.id === artistId);
+                const personalBounds = [];
+                if(p && p.place_birth && locDict[p.place_birth]) {
+                    personalBounds.push([locDict[p.place_birth].lat, locDict[p.place_birth].lon]);
                 }
-
-                setTimeout(() => {
-                    const tlGroup = document.getElementById(`tl-group-${artistId}`);
-                    if (tlGroup) {
-                        tlGroup.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                travelsData.filter(t => t.artist_id === artistId).forEach(t => {
+                    if(t.location && locDict[t.location]) {
+                        personalBounds.push([locDict[t.location].lat, locDict[t.location].lon]);
                     }
-                }, 50);
-            }
+                });
 
-            cy.nodes().removeClass('focused');
-            const node = cy.getElementById(artistId);
-            if(node.length > 0) {
-                node.addClass('focused');
-                cy.animate({ zoom: 1.5, center: { eles: node } }, { duration: 500 });
-            }
-
-            const personalBounds = [];
-            if(p && p.place_birth && locDict[p.place_birth]) {
-                personalBounds.push([locDict[p.place_birth].lat, locDict[p.place_birth].lon]);
-            }
-            travelsData.filter(t => t.artist_id === artistId).forEach(t => {
-                if(t.location && locDict[t.location]) {
-                    personalBounds.push([locDict[t.location].lat, locDict[t.location].lon]);
+                if(personalBounds.length > 0 && map) {
+                    map.fitBounds(personalBounds, { maxZoom: 8, padding: [50,50] });
                 }
-            });
-
-            if(personalBounds.length > 0) {
-                map.fitBounds(personalBounds, { maxZoom: 8, padding: [50,50] });
             }
         }
 
-        // --- 3.6 Window Management ---
+        // --- 8. Window Management ---
         function toggleMaximize(panelId) {
             const mainContent = document.getElementById('main-content');
             const isMaximized = mainContent.dataset.maximized === panelId;
 
-            document.querySelectorAll('.window-btn').forEach(btn => btn.innerText = '＋');
+            document.querySelectorAll('.window-btn').forEach(btn => btn.innerText = '🗖');
 
             if (isMaximized) {
-                mainContent.className = 'main-content';
+                mainContent.className = 'dashboard-content';
                 mainContent.dataset.maximized = '';
             } else {
-                mainContent.className = 'main-content';
+                mainContent.className = 'dashboard-content';
                 if (panelId === 'panel-timeline') mainContent.classList.add('max-timeline');
                 if (panelId === 'panel-network') mainContent.classList.add('max-network');
                 if (panelId === 'panel-map') mainContent.classList.add('max-map');
 
                 mainContent.dataset.maximized = panelId;
-                document.querySelector(`#${panelId} .window-btn`).innerText = '—';
+                document.querySelector(`#${panelId} .window-btn`).innerText = '🗗';
             }
 
             setTimeout(() => {
@@ -697,10 +964,67 @@
         }
 
         function updateUI() {
-            updateListStatus();
             updateTimeline();
             updateNetwork();
             updateMap();
+        }
+
+        // --- 9. Navigation Controls ---
+        function tlZoomIn() { if(timeline) timeline.zoomIn(0.2); }
+        function tlZoomOut() { if(timeline) timeline.zoomOut(0.2); }
+        function tlFit() { if(timeline) timeline.fit({ animation: { duration: 500, easingFunction: 'easeInOutQuad' } }); }
+
+        function tlReset() {
+            if(!timeline) return;
+            let minYear = document.getElementById('timeMin').value;
+            let maxYear = document.getElementById('timeMax').value;
+            timeline.setWindow(`${minYear}-01-01`, `${maxYear}-12-31`, { animation: { duration: 500 } });
+        }
+
+        function tlMoveLeft() {
+            if(!timeline) return;
+            let range = timeline.getWindow();
+            let interval = range.end - range.start;
+            timeline.setWindow({
+                start: range.start.valueOf() - interval * 0.2,
+                end: range.end.valueOf() - interval * 0.2
+            });
+        }
+
+        function tlMoveRight() {
+            if(!timeline) return;
+            let range = timeline.getWindow();
+            let interval = range.end - range.start;
+            timeline.setWindow({
+                start: range.start.valueOf() + interval * 0.2,
+                end: range.end.valueOf() + interval * 0.2
+            });
+        }
+
+        function netZoomIn() {
+            if(cy) cy.zoom({ level: cy.zoom() * 1.25, renderedPosition: { x: cy.width()/2, y: cy.height()/2 } });
+        }
+
+        function netZoomOut() {
+            if(cy) cy.zoom({ level: cy.zoom() * 0.8, renderedPosition: { x: cy.width()/2, y: cy.height()/2 } });
+        }
+
+        function netFit() {
+            if(cy) cy.fit(cy.elements(), 30);
+        }
+
+        function netReset() {
+            if(cy) {
+                cy.layout({
+                    name: 'cose',
+                    componentSpacing: 100,
+                    nodeOverlap: 20,
+                    refresh: 20,
+                    fit: true,
+                    padding: 30,
+                    randomize: true
+                }).run();
+            }
         }
 
         window.onload = init;
