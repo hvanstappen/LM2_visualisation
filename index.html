@@ -18,6 +18,9 @@
 
         <div class="filters-container">
             <div class="counter" id="selectedCounter">0 resultaten</div>
+            <button class="counter" style="margin-right: 20px;" onclick="resetDashboard()" title="Wis alle filters en selecties">
+                ↺
+            </button>
             <div class="filter-header">Verfijn je resultaten:</div>
             <details class="filter-dropdown" id="dropdownName">
                 <summary class="filter-btn" title="Filter op naam van een kunstenaar">Naam</summary>
@@ -51,6 +54,7 @@
                     <input type="range" id="timeMax" min="1700" max="1950" value="1950" oninput="updateTimeFilter()">
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -132,7 +136,7 @@
         let checkedNames = new Set();
         let checkedLocations = new Set();
         let artistLocMap = new Map();
-        let globalLocationVisits = {}; // NIEUW: Globale opslag voor snellere interactie
+        let globalLocationVisits = {};
         let timeFilterTimeout;
 
         function safeDate(dStr) {
@@ -159,7 +163,7 @@
         // --- 1. Initialization ---
         function init() {
             buildFilterData();
-            buildLocationVisits(); // Genereer eenmalig de data voor klik-acties
+            buildLocationVisits();
             buildFilterUI();
             initTimeline();
             initNetwork();
@@ -196,27 +200,42 @@
             window.allSortedLocations = Array.from(allLocs).sort();
         }
 
-        // Bereken alle bezoeken één keer, zodat zowel Map als Tijdlijn dit supersnel kunnen gebruiken
+        // --- UPDATE: Inclusief secundaire locaties in globale opslag ---
         function buildLocationVisits() {
             globalLocationVisits = {};
+
             peopleData.filter(p => p.level === "A").forEach(p => {
                 let pb = p.place_birth ? p.place_birth.trim() : null;
                 if(pb && locDict[pb]) {
                     if(!globalLocationVisits[pb]) globalLocationVisits[pb] = [];
-                    globalLocationVisits[pb].push({ id: p.id, name: p.name, time: `Geboren ${p.birth || '?'}` });
+                    globalLocationVisits[pb].push({ id: p.id, name: p.name, time: `geboren ${p.birth || '?'}` });
                 }
             });
 
             travelsData.forEach(t => {
-                let loc = t.location ? t.location.trim() : null;
-                if(loc && locDict[loc]) {
-                    const person = peopleData.find(p => p.id === t.artist_id && p.level === "A");
-                    if(person) {
+                const person = peopleData.find(p => p.id === t.artist_id && p.level === "A");
+                if(person) {
+                    let tStart = t.start || '?';
+                    let tEnd = t.end || '?';
+                    let timeStr = (tStart !== '?' || tEnd !== '?') ? `${tStart} - ${tEnd}` : '?';
+
+                    // Primaire locatie
+                    let loc = t.location ? t.location.trim() : null;
+                    if(loc && locDict[loc]) {
                         if(!globalLocationVisits[loc]) globalLocationVisits[loc] = [];
-                        let tStart = t.start || '?';
-                        let tEnd = t.end || '?';
-                        let timeStr = (tStart !== '?' || tEnd !== '?') ? `${tStart} - ${tEnd}` : '?';
                         globalLocationVisits[loc].push({ id: person.id, name: person.name, time: timeStr });
+                    }
+
+                    // Secundaire locaties toevoegen aan global list
+                    if (t.secondary_locations && Array.isArray(t.secondary_locations)) {
+                        t.secondary_locations.forEach(secLoc => {
+                            let sloc = secLoc.trim();
+                            if (sloc && locDict[sloc]) {
+                                if(!globalLocationVisits[sloc]) globalLocationVisits[sloc] = [];
+                                // Geef aan dat het om een secundaire locatie gaat (erft de data van de primaire trip)
+                                globalLocationVisits[sloc].push({ id: person.id, name: person.name, time: `${timeStr} (secundair)` });
+                            }
+                        });
                     }
                 }
             });
@@ -556,12 +575,10 @@
             timeline.on('click', function (properties) {
                 const isTravelItem = properties.item && properties.item.startsWith('t_');
 
-                // Focus op de kunstenaar ALLEEN als er NIET op een specifieke locatie/reis is geklikt
                 if (properties.group && !isTravelItem) {
                     setFocus(properties.group, false);
                 }
 
-                // Als er wel op een reis is geklikt, toon de locatiedetails (zoals bij de kaart)
                 if (isTravelItem) {
                     const eventId = properties.item.substring(2);
                     const travelEvent = travelsData.find(t => t.event_id === eventId);
@@ -570,12 +587,10 @@
                         const city = travelEvent.location.trim();
                         const coords = locDict[city];
 
-                        // 1. Zoom de kaart
                         if (map) {
                             map.setView([coords.lat, coords.lon], 8, { animate: true, duration: 1 });
                         }
 
-                        // 2. Open het locatie detail paneel
                         const visits = globalLocationVisits[city] || [];
                         updateLocationPanel(city, visits);
                     }
@@ -711,31 +726,31 @@
 
                     let titleHtml = `<div class="tooltip-header">${t.location}</div>`;
                     if (t.secondary_locations && t.secondary_locations.length > 0) {
-                        titleHtml += `secundair: ${t.secondary_locations.join(', ')}<br>`;
+                        titleHtml += `<strong>Secondary:</strong> ${t.secondary_locations.join(', ')}<br>`;
                     }
 
                     if (t.start) {
                         let startStr = t.start;
                         if (t.start_date_prec) startStr += ` <i>(${t.start_date_prec})</i>`;
-                        titleHtml += `begin: ${startStr}<br>`;
+                        titleHtml += `<strong>van:</strong> ${startStr}<br>`;
                     }
 
                     if (t.end) {
                         let endStr = t.end;
                         if (t.end_date_prec) endStr += ` <i>(${t.end_date_prec})</i>`;
-                        titleHtml += `einde ${endStr}<br>`;
+                        titleHtml += `<strong>tot:</strong> ${endStr}<br>`;
                     }
 
                     if ((!t.start || !t.end) && hasConfirmed) {
-                        titleHtml += `gekende data: ${cDates.join(', ')}<br>`;
+                        titleHtml += `<strong>bekende data:</strong> ${cDates.join(', ')}<br>`;
                     }
 
                     if (t.financial_means_of_travel && t.financial_means_of_travel.trim() !== '' && t.financial_means_of_travel !== 'unknown') {
-                        titleHtml += `financiering: ${t.financial_means_of_travel}<br>`;
+                        titleHtml += `<strong>financiering:</strong> ${t.financial_means_of_travel}<br>`;
                     }
 
                     if (t.event_note && t.event_note.trim() !== '') {
-                        titleHtml += `<div class="tooltip-note">opmerking: ${t.event_note}</div>`;
+                        titleHtml += `<div class="tooltip-note"><strong>opmerking:</strong> ${t.event_note}</div>`;
                     }
 
                     items.add({
@@ -839,6 +854,7 @@
             });
         }
 
+        // --- UPDATE: Map en Active Cities ---
         function initMap() {
             map = L.map('map-container').setView([48.85, 2.35], 4);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -855,6 +871,13 @@
             });
             travelsData.filter(t => selectedArtists.has(t.artist_id)).forEach(t => {
                 if(t.location && locDict[t.location]) activeCities.add(t.location.trim());
+                // Markeer de stad OOK als actief als het een secundaire locatie was
+                if(t.secondary_locations && Array.isArray(t.secondary_locations)) {
+                    t.secondary_locations.forEach(sl => {
+                        let sloc = sl.trim();
+                        if (sloc && locDict[sloc]) activeCities.add(sloc);
+                    });
+                }
             });
 
             const bounds = [];
@@ -862,7 +885,6 @@
                 const coords = locDict[city];
                 const marker = L.marker([coords.lat, coords.lon]).addTo(map);
 
-                // Gebruik de pre-berekende bezoeken array
                 const visits = globalLocationVisits[city] || [];
 
                 const uniqueVisitsStrings = [...new Set(visits.map(v => v.time === '?' ? v.name : `${v.name} (${v.time})`))];
@@ -883,7 +905,7 @@
             if(bounds.length > 0) map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
         }
 
-        // --- 7. Focus Logic ---
+        // --- UPDATE: Focus inclusief secundaire locatie coördinaten ---
         function setFocus(artistId, skipZooming = false) {
             focusedArtistId = artistId;
             updateDataPanel(artistId);
@@ -927,6 +949,14 @@
                 travelsData.filter(t => t.artist_id === artistId).forEach(t => {
                     if(t.location && locDict[t.location]) {
                         personalBounds.push([locDict[t.location].lat, locDict[t.location].lon]);
+                    }
+                    if(t.secondary_locations && Array.isArray(t.secondary_locations)) {
+                        t.secondary_locations.forEach(sl => {
+                            let sloc = sl.trim();
+                            if (sloc && locDict[sloc]) {
+                                personalBounds.push([locDict[sloc].lat, locDict[sloc].lon]);
+                            }
+                        });
                     }
                 });
 
@@ -1025,6 +1055,53 @@
                     randomize: true
                 }).run();
             }
+        }
+
+        // --- 10. Algemene Reset ---
+        function resetDashboard() {
+            // 1. Wis de focus (deselecteer de actieve kunstenaar)
+            focusedArtistId = null;
+
+            // 2. Maak het details-paneel weer leeg
+            const panelHeader = document.querySelector('#panel-details .panel-header span');
+            if (panelHeader) panelHeader.innerText = 'Details';
+            document.getElementById('dataPanel').innerHTML = '<i style="color: var(--text-muted);">Klik op een naam in de tijdslijn, het netwerk of de kaart om details te zien.</i>';
+
+            // 3. Reset de tijd-sliders naar de originele waardes
+            document.getElementById('timeMin').value = 1700;
+            document.getElementById('timeMax').value = 1950;
+            document.getElementById('timeMinVal').innerText = 1700;
+            document.getElementById('timeMaxVal').innerText = 1950;
+
+            // 4. Maak zoekvelden in de dropdowns leeg en herstel de zichtbaarheid
+            document.querySelectorAll('.filter-search').forEach(input => {
+                input.value = '';
+                searchChecklist(input.closest('.dropdown-content').querySelector('.checklist').id, '');
+            });
+
+            // 5. Vink álle checkboxes in de dropdowns weer aan en update de datalijsten
+            checkedNames.clear();
+            checkedLocations.clear();
+
+            document.querySelectorAll('#nameFilter input[type="checkbox"]').forEach(cb => {
+                cb.checked = true;
+                checkedNames.add(cb.value);
+            });
+
+            document.querySelectorAll('#locFilter input[type="checkbox"]').forEach(cb => {
+                cb.checked = true;
+                checkedLocations.add(cb.value);
+            });
+
+            // 6. Pas alle filters opnieuw toe (dit tekent het dashboard opnieuw met álle data)
+            applyFilters();
+
+            // 7. Herstel de 'camera's' van de 3 hoofdvisualisaties
+            setTimeout(() => {
+                tlReset();      // Tijdlijn naar 1700-1950
+                netFit();       // Netwerk in het midden
+                if(map) map.setView([48.85, 2.35], 4); // Kaart terug naar Europa
+            }, 100);
         }
 
         window.onload = init;
