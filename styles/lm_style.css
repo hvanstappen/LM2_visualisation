@@ -1,0 +1,362 @@
+:root {
+    --bg-body: #fafaf9;
+    --bg-panel: #ffffff;
+    --border-light: #e7e5e4;
+    --header-grey: #e6E6E3;
+    --border-dark: #d6d3d1;
+    --text-main: #1c1917;
+    --text-muted: #57534e;
+    --accent-dark: #292524;
+    --accent-red: #EA1128;
+    --accent-red-hover: #c80d20;
+    --highlight-bg: #f5f5f4;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+body { width: 100vw; height: 100vh; display: flex; flex-direction: column; overflow: hidden; background-color: var(--bg-body); color: var(--text-main); }
+
+/* --- Topbar & Filters --- */
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    height: 70px;
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--border-dark);
+    z-index: 1000;
+    flex-shrink: 0;
+}
+
+.topbar-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--text-main);
+    margin-right: 30px;
+}
+
+.filters-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+}
+
+/* Dropdowns */
+details.filter-dropdown { position: relative; }
+summary.filter-btn {
+    padding: 8px 16px;
+    background: var(--accent-red);
+    border: 1px solid var(--border-dark);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: white;
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s;
+}
+summary.filter-btn:hover { border-color: var(--accent-dark); }
+summary.filter-btn::-webkit-details-marker { display: none; }
+summary.filter-btn::after { content: '▼'; font-size: 0.6rem; color: white); transition: transform 0.2s; }
+details[open] summary.filter-btn::after { transform: rotate(180deg); }
+
+.dropdown-content {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 8px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-dark);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    width: 280px;
+    padding: 15px;
+    border-radius: 4px;
+    z-index: 1001;
+}
+
+.filter-search { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid var(--border-dark); border-radius: 2px; font-size: 0.8rem; outline: none; }
+.filter-search:focus { border-color: var(--accent-dark); }
+.filter-actions { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
+.filter-actions a { color: var(--text-muted); cursor: pointer; text-decoration: none; transition: color 0.2s; }
+.filter-actions a:hover { color: var(--accent-red); }
+
+.checklist { list-style: none; max-height: 250px; overflow-y: auto; border: 1px solid var(--border-light); border-radius: 2px; padding: 5px 0; margin: 0; }
+.checklist li { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; padding: 6px 10px; cursor: pointer; }
+.checklist li:hover { background: var(--highlight-bg); }
+.checklist input[type="checkbox"] { accent-color: var(--accent-red); cursor: pointer; margin: 0; width: 14px; height: 14px; flex-shrink: 0; }
+
+/* Facet en Search hiders */
+.checklist li.facet-hidden, .checklist li.search-hidden { display: none !important; }
+
+/* Dubbele Slider (Topbar) */
+.filter-slider-container { display: flex; align-items: center; gap: 15px; margin-left: 20px; padding-left: 20px; border-left: 1px solid var(--border-light); }
+.filter-slider-container .filter-header { font-size: 0.85rem; font-weight: 600; color: var(--accent-dark); white-space: nowrap; }
+.slider-wrapper { position: relative; height: 30px; width: 200px; display: flex; align-items: center; }
+.slider-track { position: absolute; left: 0; width: 100%; height: 4px; background: var(--border-light); border-radius: 2px; }
+.slider-wrapper input[type="range"] { position: absolute; left: 0; width: 100%; -webkit-appearance: none; background: transparent; pointer-events: none; margin: 0; }
+.slider-wrapper input[type="range"]::-webkit-slider-thumb { pointer-events: auto; -webkit-appearance: none; width: 16px; height: 16px; background: var(--accent-red); border-radius: 50%; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.3); transition: transform 0.1s; }
+.slider-wrapper input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+.counter { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); background: var(--highlight-bg); padding: 8px 12px; border-radius: 4px; white-space: nowrap; }
+
+
+/* --- Main Dashboard Content --- */
+.dashboard-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    min-height: 0;
+    min-width: 0;
+}
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-panel);
+    position: relative;
+    min-width: 0;
+}
+
+.panel-header { padding: 10px 20px; background: var(--header-grey); color: var(--accent-dark); display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; flex-shrink: 0; min-height: 46px; }
+.panel-content { flex: 1; position: relative; overflow: auto; width: 100%; height: 100%; min-height: 0; min-width: 0; }
+.window-btn { background: transparent; border: 1px solid rgba(255,255,255,0.4); border-radius: 2px; color: var(--accent-dark); cursor: pointer; width: 26px; height: 26px; display: flex; justify-content: center; align-items: center; transition: all 0.2s; font-size: 1rem; }
+.window-btn:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+
+/* Upper Half: Timeline */
+.timeline-wrapper {
+    flex: 1;
+    border-bottom: 1px solid var(--border-dark);
+    min-height: 0;
+    transition: max-height 0.2s ease;
+}
+
+/* Lower Half: 3 Panels */
+.bottom-wrapper {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+    min-width: 0;
+}
+
+.details-panel {
+    flex: 0 0 350px; /* Vaste breedte voor details */
+    border-right: 1px solid var(--border-dark);
+}
+
+.network-panel {
+    flex: 1; /* Neemt overgebleven ruimte in */
+    border-right: 1px solid var(--border-dark);
+}
+
+.map-panel {
+    flex: 1; /* Neemt overgebleven ruimte in */
+}
+
+/* Maximize CSS States */
+.dashboard-content.max-timeline .bottom-wrapper { display: none !important; }
+.dashboard-content.max-timeline .timeline-wrapper { border-bottom: none; }
+.dashboard-content.max-network .timeline-wrapper { display: none !important; }
+.dashboard-content.max-network .details-panel { display: none !important; }
+.dashboard-content.max-network .map-panel { display: none !important; }
+.dashboard-content.max-network .network-panel { border-right: none; }
+.dashboard-content.max-map .timeline-wrapper { display: none !important; }
+.dashboard-content.max-map .details-panel { display: none !important; }
+.dashboard-content.max-map .network-panel { display: none !important; }
+
+/* --- Data Panel Styling (Inside details-panel) --- */
+.data-panel { padding: 15px 20px; font-size: 0.85rem; }
+.data-panel table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+.data-panel th, .data-panel td { text-align: left; padding: 8px 4px; border-bottom: 1px solid var(--border-light); vertical-align: top; }
+.data-panel th { width: 35%; color: var(--text-muted); font-weight: 600; }
+
+/* --- Vis-Timeline Styling --- */
+.vis-item.vis-background { background-color: rgba(41, 37, 36, 0.2); cursor: pointer; }
+.vis-item.travel-event { background-color: var(--header-grey); color: black; border: none !important;  font-size: 0.8rem; }
+.vis-time-axis .vis-text { color: var(--text-muted); font-weight: 500; font-size: 0.8rem; }
+
+.vis-item.vis-background.inferred-birth { background-color: transparent !important; background-image: linear-gradient(to right, transparent, #eef1fb 20%); }
+.vis-item.vis-background.inferred-death { background-color: transparent !important; background-image: linear-gradient(to left, transparent, #eef1fb 20%); }
+.vis-item.vis-background.inferred-both { background-color: transparent !important; background-image: linear-gradient(to right, transparent, #eef1fb 20%, #eef1fb 80%, transparent); }
+
+/* --- Geselecteerde Tijdlijn Items (Zwart Kader) --- */
+.vis-item.vis-selected.travel-event {
+    background-color: var(--accent-red) !important;
+    border: 2px solid #000000 !important;
+    box-shadow: 0 0 8px rgba(0,0,0,0.3) !important;
+    z-index: 10 !important; /* Zorgt dat het blokje visueel boven de rest uitspringt */
+}
+
+/* Timeline Fades */
+.vis-item.travel-event.fade-out { background: linear-gradient(to right, var(--header-grey), transparent) !important; border: none !important; box-shadow: none !important; }
+.vis-item.travel-event.fade-in { background: linear-gradient(to right, transparent, var(--header-grey)) !important; border: none !important; box-shadow: none !important; }
+.vis-item.travel-event.fade-both { background: linear-gradient(to right, transparent, var(--header-grey) 20%, var(--header-grey) 80%, transparent) !important; border: none !important; box-shadow: none !important; }
+
+/* Timeline Text Overflow */
+.vis-item { overflow: visible !important; }
+.vis-item .vis-item-overflow { overflow: visible !important; }
+.vis-item .vis-item-content { overflow: visible !important; white-space: nowrap; text-shadow: 0px 0px 4px rgba(255, 255, 255, 0.9), 0px 0px 2px rgba(255, 255, 255, 0.9); }
+
+/* Timeline Tooltips */
+.vis-tooltip { background-color: #ffffff; border: 1px solid var(--border-dark); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); border-radius: 2px; padding: 15px 20px; font-family: 'Inter', system-ui, sans-serif !important; font-size: 0.85rem; color: var(--text-main); z-index: 1000 !important; line-height: 1.6; max-width: 320px; }
+.vis-tooltip strong { color: var(--accent-dark); font-weight: 600; }
+.vis-tooltip i { color: var(--text-muted); font-size: 0.8rem; font-style: italic; }
+.vis-tooltip .tooltip-header { font-size: 1.05rem; font-weight: 700; color: var(--accent-red); margin-bottom: 8px; border-bottom: 1px solid var(--border-light); padding-bottom: 4px; }
+.vis-tooltip .tooltip-note { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border-light); color: var(--text-muted); }
+
+/* Timeline Groups */
+.vis-labelset .vis-label { cursor: pointer; transition: background-color 0.2s; border-left: 4px solid transparent; }
+.vis-labelset .vis-label:hover { background-color: var(--highlight-bg); }
+.vis-labelset .vis-label.focused-vis-label { background-color: var(--highlight-bg); border-left-color: var(--accent-dark); }
+.vis-labelset .vis-label.focused-vis-label .vis-inner { font-weight: 600; }
+
+/* --- Lijn de Tijdlijn-kolom uit met het Details paneel --- */
+.vis-labelset .vis-label {
+    width: 350px !important;
+    min-width: 350px !important;
+    max-width: 350px !important;
+    box-sizing: border-box;
+}
+
+/* Zorg dat het rechterrandje exact matcht met de grenslijn eronder */
+.vis-panel.vis-left {
+    border-right: 1px solid var(--border-dark) !important;
+}
+
+
+/* Actieknop in het Details Paneel */
+.action-btn {
+    margin-top: 15px;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+}
+.action-btn.add-btn {
+    background: var(--accent-dark);
+    color: white;
+}
+.action-btn.add-btn:hover {
+    background: var(--accent-red);
+}
+.action-btn.remove-btn {
+    background: var(--highlight-bg);
+    color: var(--text-muted);
+    border: 1px solid var(--border-dark);
+}
+.action-btn.remove-btn:hover {
+    background: var(--border-light);
+    color: var(--accent-dark);
+}
+
+/* --- PERFECTE UITLIJNING & SCROLLBARS --- */
+
+/* 1. Het details-paneel links onderin */
+.details-panel {
+    flex: 0 0 350px !important;
+    width: 350px !important;
+    max-width: 350px !important;
+    border-right: 1px solid var(--border-dark) !important;
+    box-sizing: border-box;
+}
+
+/* 2. De namenlijst in de tijdlijn links bovenin */
+.vis-panel.vis-left {
+    width: 350px !important;
+    min-width: 350px !important;
+    max-width: 350px !important;
+    border-right: 1px solid var(--border-dark) !important;
+    box-sizing: border-box;
+
+    /* ZET DE SCROLLBAR TERUG! */
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
+}
+
+/* 3. Pas de breedte van de labels aan zodat de scrollbar er exact in past */
+/* 350px totaal - 1px border - 8px scrollbar = 341px */
+.vis-labelset .vis-label {
+    width: 340px !important;
+    min-width: 340px !important;
+    max-width: 340px !important;
+    box-sizing: border-box;
+}
+
+/* --- SCROLLBAR LOGICA --- */
+
+/* Forceer ook altijd een scrollbar in het data-paneel voor perfecte symmetrie */
+.data-panel, .checklist {
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
+}
+
+/* Elegante, moderne scrollbars (8px breed) voor de hele applicatie */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--border-dark);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* --- Zwevende Navigatie Controls --- */
+.nav-controls {
+    position: absolute;
+    top: 55px; /* Onder de header */
+    right: 25px; /* Net links van de scrollbar */
+    display: flex;
+    gap: 4px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 4px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    border: 1px solid var(--border-light);
+}
+
+.nav-btn {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-dark);
+    color: var(--text-muted);
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.nav-btn:hover {
+    background: var(--highlight-bg);
+    color: var(--accent-red);
+    border-color: var(--accent-red);
+}
+
+.nav-divider {
+    width: 1px;
+    background: var(--border-light);
+    margin: 0 2px;
+}
