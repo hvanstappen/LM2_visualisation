@@ -6713,8 +6713,8 @@ const travelsData = [
         "secondary_locations": [],
         "description": "",
         "start": "1768",
-        "start_date_prec": "42.2642207",
-        "start_date_source": "-71.8208828",
+        "start_date_prec": "inferred",
+        "start_date_source": "",
         "confirmed_date": [
             "1769"
         ],
