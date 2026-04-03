@@ -444,6 +444,7 @@
                 tableHtml += `<tr><th>opmerking</th><td>${p.biographical_note}</td></tr>`;
             }
 
+
             if (p.RKDartist_id && p.RKDartist_id !== "none" && p.RKDartist_id.trim() !== "") {
                 tableHtml += `<tr><th>RKD link</th><td><a href="https://rkd.nl/artists/${p.RKDartist_id}" target="_blank" style="color: var(--accent-red); font-weight:500;">${p.RKDartist_id}</a></td></tr>`;
             }
@@ -749,9 +750,15 @@
                         titleHtml += `<strong>financiering:</strong> ${t.financial_means_of_travel}<br>`;
                     }
 
-                    if (t.event_note && t.event_note.trim() !== '') {
-                        titleHtml += `<div class="tooltip-note"><strong>opmerking:</strong> ${t.event_note}</div>`;
+                    if (t.description && t.description.trim() !== '') {
+                        titleHtml += `<div class="tooltip-note"><strong>opmerking:</strong> ${t.description}</div>`;
                     }
+
+                    if (t.event_note && t.event_note.trim() !== '') {
+                        titleHtml += `<div class="tooltip-note"><strong>noot:</strong> ${t.event_note}</div>`;
+                    }
+
+
 
                     items.add({
                         id: `t_${t.event_id}`, group: person.id,
