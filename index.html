@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leerling-Meester Netwerk Dashboard</title>
+    <title>Leerling-Meester Netwerk</title>
 
     <link href="styles/vis-timeline-graph2d.min.css" rel="stylesheet" />
     <link href="styles/leaflet.css" rel="stylesheet"  type="text/css" />
@@ -14,40 +14,42 @@
 <body>
 
     <div class="topbar">
-        <div class="topbar-title" width="350px">Leerling-Meester Netwerk</div>
+        <div class="topbar-title" width="350px" style="display:flex; align-items:center;">
+            <span data-i18n="title">Leerling-Meester Netwerk</span>
+        </div>
 
         <div class="filters-container">
             <div class="counter" id="selectedCounter">0 resultaten</div>
-            <button class="counter" style="margin-right: 20px;" onclick="resetDashboard()" title="Wis alle filters en selecties">
+            <button class="counter" style="margin-right: 20px;" onclick="resetDashboard()" data-i18n-title="clearAll" title="Wis alle filters en selecties">
                 ↺
             </button>
-            <div class="filter-header">Verfijn je resultaten:</div>
+            <div class="filter-header" data-i18n="refine">Verfijn je resultaten:</div>
             <details class="filter-dropdown" id="dropdownName">
-                <summary class="filter-btn" title="Filter op naam van een kunstenaar">Naam</summary>
+                <summary class="filter-btn" data-i18n-title="nameTitle" data-i18n="name" title="Filter op naam van een kunstenaar">Naam</summary>
                 <div class="dropdown-content">
-                    <input type="text" class="filter-search" onkeyup="searchChecklist('nameFilter', this.value)" placeholder="Zoek een naam...">
+                    <input type="text" class="filter-search" onkeyup="searchChecklist('nameFilter', this.value)" data-i18n-placeholder="searchName" placeholder="Zoek een naam...">
                     <div class="filter-actions">
-                        <a onclick="checkAll('nameFilter', true)">Selecteer alles</a>
-                        <a onclick="checkAll('nameFilter', false)">Wis alles</a>
+                        <a onclick="checkAll('nameFilter', true)" data-i18n="selectAll">Selecteer alles</a>
+                        <a onclick="checkAll('nameFilter', false)" data-i18n="clearSelection">Wis alles</a>
                     </div>
                     <ul class="checklist" id="nameFilter"></ul>
                 </div>
             </details>
 
             <details class="filter-dropdown" id="dropdownLoc">
-                <summary class="filter-btn" title="Filter op plaatsnaam">Plaats</summary>
+                <summary class="filter-btn" data-i18n-title="locTitle" data-i18n="location" title="Filter op plaatsnaam">Plaats</summary>
                 <div class="dropdown-content">
-                    <input type="text" class="filter-search" onkeyup="searchChecklist('locFilter', this.value)" placeholder="Zoek een locatie...">
+                    <input type="text" class="filter-search" onkeyup="searchChecklist('locFilter', this.value)" data-i18n-placeholder="searchLoc" placeholder="Zoek een locatie...">
                     <div class="filter-actions">
-                        <a onclick="checkAll('locFilter', true)">Selecteer alles</a>
-                        <a onclick="checkAll('locFilter', false)">Wis alles</a>
+                        <a onclick="checkAll('locFilter', true)" data-i18n="selectAll">Selecteer alles</a>
+                        <a onclick="checkAll('locFilter', false)" data-i18n="clearSelection">Wis alles</a>
                     </div>
                     <ul class="checklist" id="locFilter"></ul>
                 </div>
             </details>
 
             <div class="filter-slider-container">
-                <div class="filter-header" title="Gebruik de sliders om de periode te kiezen">Periode <span id="timeMinVal">1700</span> - <span id="timeMaxVal">1950</span></div>
+                <div class="filter-header" data-i18n-title="periodTitle" title="Gebruik de sliders om de periode te kiezen"><span data-i18n="period">Periode</span> <span id="timeMinVal">1700</span> - <span id="timeMaxVal">1950</span></div>
                 <div class="slider-wrapper">
                     <div class="slider-track"></div>
                     <input type="range" id="timeMin" min="1700" max="1950" value="1700" oninput="updateTimeFilter()">
@@ -56,25 +58,28 @@
             </div>
 
         </div>
+                <div class="topbar-title" style="display:flex; align-items:right;">
+            <button class="action-btn remove-btn" style="margin-left: 15px; margin-top: 0; padding: 4px 8px; width: auto; font-size: 0.7rem;" onclick="toggleLanguage()" id="langToggleBtn">EN</button>
+        </div>
     </div>
 
     <div class="dashboard-content" id="main-content">
 
         <div class="panel timeline-wrapper" id="panel-timeline">
             <div class="panel-header">
-                <span title="Klik op een naam om in te zoomen op de tijdlijn">Tijdslijn</span>
+                <span data-i18n-title="timelineTitle" data-i18n="timeline" title="Klik op een naam om in te zoomen op de tijdlijn">Tijdslijn</span>
                 <button class="window-btn" onclick="toggleMaximize('panel-timeline')" title="Maximize/Restore">🗖</button>
             </div>
 
             <div class="nav-controls">
-                <button class="nav-btn" onclick="tlMoveLeft()" title="Naar links">◄</button>
-                <button class="nav-btn" onclick="tlMoveRight()" title="Naar rechts">►</button>
+                <button class="nav-btn" onclick="tlMoveLeft()" data-i18n-title="moveLeft" title="Naar links">◄</button>
+                <button class="nav-btn" onclick="tlMoveRight()" data-i18n-title="moveRight" title="Naar rechts">►</button>
                 <div class="nav-divider"></div>
-                <button class="nav-btn" onclick="tlZoomIn()" title="Zoom in">＋</button>
-                <button class="nav-btn" onclick="tlZoomOut()" title="Zoom uit">－</button>
+                <button class="nav-btn" onclick="tlZoomIn()" data-i18n-title="zoomIn" title="Zoom in">＋</button>
+                <button class="nav-btn" onclick="tlZoomOut()" data-i18n-title="zoomOut" title="Zoom uit">－</button>
                 <div class="nav-divider"></div>
-                <button class="nav-btn" onclick="tlFit()" title="Maak passend">⛶</button>
-                <button class="nav-btn" onclick="tlReset()" title="Stel in op geselecteerde periode">↺</button>
+                <button class="nav-btn" onclick="tlFit()" data-i18n-title="fit" title="Maak passend">⛶</button>
+                <button class="nav-btn" onclick="tlReset()" data-i18n-title="resetPeriod" title="Stel in op geselecteerde periode">↺</button>
             </div>
 
             <div class="panel-content" id="timeline-container"></div>
@@ -84,24 +89,25 @@
 
             <div class="panel details-panel" id="panel-details">
                 <div class="panel-header">
-                    <span title="Gebruik de knoppen om kunstenaars of locaties aan de selectie toe te voegen of te verwijderen">Details</span>
+                    <span data-i18n-title="detailsTitle" data-i18n="details" title="Gebruik de knoppen om kunstenaars of locaties aan de selectie toe te voegen of te verwijderen">Details</span>
                 </div>
                 <div class="panel-content data-panel" id="dataPanel">
-                    <i style="color: var(--text-muted);">Klik op een naam in de tijdslijn, het netwerk of de kaart om details te zien.</i>
+                    <i style="color: var(--text-muted);" data-i18n="clickPrompt">Klik op een naam in de tijdslijn, het netwerk of de kaart om details te zien.</i>
                 </div>
             </div>
 
             <div class="panel network-panel" id="panel-network">
                 <div class="panel-header">
-                    <span title="Klik op een naam om details te zien">Netwerk</span>
+                    <span data-i18n-title="networkTitle" data-i18n="network" title="Klik op een naam om details te zien">Netwerk</span>
                     <button class="window-btn" onclick="toggleMaximize('panel-network')" title="Maximize/Restore">🗖</button>
                 </div>
 
-                <div class="nav-controls"> <button class="nav-btn" onclick="netZoomIn()" title="Zoom in">＋</button>
-                    <button class="nav-btn" onclick="netZoomOut()" title="Zoom uit">－</button>
+                <div class="nav-controls"> 
+                    <button class="nav-btn" onclick="netZoomIn()" data-i18n-title="zoomIn" title="Zoom in">＋</button>
+                    <button class="nav-btn" onclick="netZoomOut()" data-i18n-title="zoomOut" title="Zoom uit">－</button>
                     <div class="nav-divider"></div>
-                    <button class="nav-btn" onclick="netFit()" title="Maak passend">⛶</button>
-                    <button class="nav-btn" onclick="netReset()" title="Herstel">↺</button>
+                    <button class="nav-btn" onclick="netFit()" data-i18n-title="fit" title="Maak passend">⛶</button>
+                    <button class="nav-btn" onclick="netReset()" data-i18n-title="reset" title="Herstel">↺</button>
                 </div>
 
                 <div class="panel-content" id="network-container" style="overflow: hidden;"></div>
@@ -109,8 +115,7 @@
 
             <div class="panel map-panel" id="panel-map">
                 <div class="panel-header">
-                    <span title="klik op een locatie om een lijst te zien">Locaties</span>
-                    <span title="klik op een locatie om een lijst te zien"> i </span>
+                    <span data-i18n-title="locationsTitle" data-i18n="locations" title="klik op een locatie om een lijst te zien">Locaties</span>
                     <button class="window-btn" onclick="toggleMaximize('panel-map')" title="Maximize/Restore">🗖</button>
                 </div>
                 <div class="panel-content" id="map-container" style="overflow: hidden;"></div>
@@ -125,6 +130,164 @@
     <script src="source_data/leerling_meester_sourcedata.js"></script>
 
     <script>
+        // --- 0. Dictionary ---
+        const translations = {
+            nl: {
+                // Labels
+                title: "Leerling-Meester Netwerk",
+                results: "resultaten",
+                clearAll: "Wis alle filters en selecties",
+                refine: "Verfijn je resultaten:",
+                name: "Naam",
+                nameTitle: "Filter op naam van een kunstenaar",
+                searchName: "Zoek een naam...",
+                selectAll: "Selecteer alles",
+                clearSelection: "Wis alles",
+                location: "Plaats",
+                locTitle: "Filter op plaatsnaam",
+                searchLoc: "Zoek een locatie...",
+                period: "Periode",
+                periodTitle: "Gebruik de sliders om de periode te kiezen",
+                timeline: "Tijdslijn",
+                timelineTitle: "Klik op een naam om in te zoomen op de tijdlijn",
+                moveLeft: "Naar links",
+                moveRight: "Naar rechts",
+                zoomIn: "Zoom in",
+                zoomOut: "Zoom uit",
+                fit: "Maak passend",
+                resetPeriod: "Stel in op geselecteerde periode",
+                details: "Details",
+                detailsTitle: "Gebruik de knoppen om kunstenaars of locaties aan de selectie toe te voegen of te verwijderen",
+                clickPrompt: "Klik op een naam in de tijdslijn, het netwerk of de kaart om details te zien.",
+                network: "Netwerk",
+                networkTitle: "Klik op een naam om details te zien",
+                reset: "Herstel",
+                locations: "Locaties",
+                locationsTitle: "Klik op een locatie om een lijst te zien",
+                // JS Fixed values
+                variants: "naamsvarianten",
+                born: "geboren",
+                died: "overleden",
+                profession: "beroep",
+                nationality: "nationaliteit",
+                note: "opmerking",
+                addSelection: "Voeg toe aan selectie",
+                removeSelection: "Verwijder uit selectie",
+                locDetails: "Locatie details",
+                colName: "Naam",
+                colPeriod: "Periode",
+                unknown: "onbekend",
+                filterThisLoc: "Filter op deze locatie",
+                lifeSpan: "Levensduur",
+                uncertainDeath: "* Overlijdensdatum onzeker: afgeleid van reisgegevens of levensverwachting.",
+                uncertainBirth: "* Geboortedatum onzeker: afgeleid van reisgegevens of levensverwachting.",
+                uncertainBoth: "* Geboorte- en Overlijdensdatum onzeker: afgeleid van reisgegevens.",
+                secLoc: "Secundair:",
+                from: "van:",
+                to: "tot:",
+                knownDates: "bekende data:",
+                financing: "financiering:",
+                eventNote: "noot:",
+                artistsSelected: "kunstenaars geselecteerd"
+            },
+            en: {
+                // Labels
+                title: "Apprentice-Master Network",
+                results: "results",
+                clearAll: "Clear all filters and selections",
+                refine: "Refine your results:",
+                name: "Name",
+                nameTitle: "Filter by artist name",
+                searchName: "Search a name...",
+                selectAll: "Select all",
+                clearSelection: "Clear all",
+                location: "Location",
+                locTitle: "Filter by location name",
+                searchLoc: "Search a location...",
+                period: "Period",
+                periodTitle: "Use sliders to select the period",
+                timeline: "Timeline",
+                timelineTitle: "Click a name to zoom in on the timeline",
+                moveLeft: "Move left",
+                moveRight: "Move right",
+                zoomIn: "Zoom in",
+                zoomOut: "Zoom out",
+                fit: "Fit to screen",
+                resetPeriod: "Reset to selected period",
+                details: "Details",
+                detailsTitle: "Use buttons to add or remove artists/locations from selection",
+                clickPrompt: "Click a name in the timeline, network or map to see details.",
+                network: "Network",
+                networkTitle: "Click a name to see details",
+                reset: "Reset",
+                locations: "Locations",
+                locationsTitle: "Click a location to see a list",
+                // JS Fixed values
+                variants: "name variants",
+                born: "born",
+                died: "died",
+                profession: "profession",
+                nationality: "nationality",
+                note: "note",
+                addSelection: "Add to selection",
+                removeSelection: "Remove from selection",
+                locDetails: "Location details",
+                colName: "Name",
+                colPeriod: "Period",
+                unknown: "unknown",
+                filterThisLoc: "Filter by this location",
+                lifeSpan: "Lifespan",
+                uncertainDeath: "* Date of death uncertain: derived from travel data or life expectancy.",
+                uncertainBirth: "* Date of birth uncertain: derived from travel data or life expectancy.",
+                uncertainBoth: "* Birth and death dates uncertain: derived from travel data.",
+                secLoc: "Secondary:",
+                from: "from:",
+                to: "to:",
+                knownDates: "known dates:",
+                financing: "financing:",
+                eventNote: "note:",
+                artistsSelected: "artists selected"
+            }
+        };
+
+        let currentLang = 'nl'; // Start in Dutch
+
+        function toggleLanguage() {
+            currentLang = (currentLang === 'nl') ? 'en' : 'nl';
+            document.getElementById('langToggleBtn').innerText = (currentLang === 'nl') ? 'EN' : 'NL';
+            
+            // 1. Update all HTML data-i18n elements
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(translations[currentLang][key]) el.innerHTML = translations[currentLang][key];
+            });
+            document.querySelectorAll('[data-i18n-title]').forEach(el => {
+                const key = el.getAttribute('data-i18n-title');
+                if(translations[currentLang][key]) el.setAttribute('title', translations[currentLang][key]);
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if(translations[currentLang][key]) el.setAttribute('placeholder', translations[currentLang][key]);
+            });
+
+            // 2. Rebuild location data so translations ('geboren' / 'secundair') are included
+            buildLocationVisits();
+
+            // 3. Rebuild the counter
+            document.getElementById('selectedCounter').innerText = `${selectedArtists.size} ${translations[currentLang].artistsSelected}`;
+
+            // 4. Update the dynamic panels and tooltips
+            if (focusedArtistId) {
+                updateDataPanel(focusedArtistId);
+                // reset Artist focus.
+                setFocus(focusedArtistId, true);
+            } else {
+                document.getElementById('dataPanel').innerHTML = `<i style="color: var(--text-muted);" data-i18n="clickPrompt">${translations[currentLang].clickPrompt}</i>`;
+            }
+            updateTimeline();
+            updateMap();
+        }
+
         // --- Setup & Helpers ---
         const locDict = Locations.reduce((acc, loc) => ({ ...acc, [loc.location_name]: { lat: loc.lat, lon: loc.lon } }), {});
 
@@ -132,7 +295,7 @@
         let focusedArtistId = null;
         let timeline, cy, map;
 
-        // Filter variabelen
+        // Filter variabels
         let checkedNames = new Set();
         let checkedLocations = new Set();
         let artistLocMap = new Map();
@@ -169,9 +332,14 @@
             initNetwork();
             initMap();
             applyFilters();
+            // Start the interface with the selected language (for consistency)
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(translations[currentLang][key]) el.innerHTML = translations[currentLang][key];
+            });
         }
 
-        // --- 2. Data Voorbereiding voor Filters & Klik-acties ---
+        // --- 2. Data preparation for Filters & Click actions ---
         function buildFilterData() {
             let allLocs = new Set();
 
@@ -200,15 +368,15 @@
             window.allSortedLocations = Array.from(allLocs).sort();
         }
 
-        // --- UPDATE: Inclusief secundaire locaties in globale opslag ---
         function buildLocationVisits() {
             globalLocationVisits = {};
+            const tText = translations[currentLang];
 
             peopleData.filter(p => p.level === "A").forEach(p => {
                 let pb = p.place_birth ? p.place_birth.trim() : null;
                 if(pb && locDict[pb]) {
                     if(!globalLocationVisits[pb]) globalLocationVisits[pb] = [];
-                    globalLocationVisits[pb].push({ id: p.id, name: p.name, time: `geboren ${p.birth || '?'}` });
+                    globalLocationVisits[pb].push({ id: p.id, name: p.name, time: `${tText.born} ${p.birth || '?'}` });
                 }
             });
 
@@ -226,14 +394,13 @@
                         globalLocationVisits[loc].push({ id: person.id, name: person.name, time: timeStr });
                     }
 
-                    // Secundaire locaties toevoegen aan global list
+                    // Add secondary locations to global list
                     if (t.secondary_locations && Array.isArray(t.secondary_locations)) {
                         t.secondary_locations.forEach(secLoc => {
                             let sloc = secLoc.trim();
                             if (sloc && locDict[sloc]) {
                                 if(!globalLocationVisits[sloc]) globalLocationVisits[sloc] = [];
-                                // Geef aan dat het om een secundaire locatie gaat (erft de data van de primaire trip)
-                                globalLocationVisits[sloc].push({ id: person.id, name: person.name, time: `${timeStr} (secundair)` });
+                                globalLocationVisits[sloc].push({ id: person.id, name: person.name, time: `${timeStr} (${tText.secLoc.replace(':','')})` });
                             }
                         });
                     }
@@ -241,7 +408,7 @@
             });
         }
 
-        // --- 3. UI Bouwen voor Filters ---
+        // --- 3. Build UI for Filters ---
         function buildFilterUI() {
             const nameListEl = document.getElementById('nameFilter');
             peopleData.filter(p => p.level === "A").sort((a,b) => a.name.localeCompare(b.name)).forEach(p => {
@@ -286,7 +453,7 @@
             });
         }
 
-        // --- 4. Faceted Filtering Logica ---
+        // --- 4. Faceted Filtering Logic ---
         function searchChecklist(filterId, term) {
             term = term.toLowerCase();
             const items = document.querySelectorAll(`#${filterId} li`);
@@ -399,15 +566,16 @@
             updateFacetUI('nameFilter', validNamesForFacet);
             updateFacetUI('locFilter', validLocsForFacet);
 
-            document.getElementById('selectedCounter').innerText = `${selectedArtists.size} kunstenaars geselecteerd`;
+            document.getElementById('selectedCounter').innerText = `${selectedArtists.size} ${translations[currentLang].artistsSelected}`;
 
             updateUI();
         }
 
-        // --- 5A. Data Paneel (Artist Details) ---
+        // --- 5A. Data Panel (Artist Details) ---
         function updateDataPanel(id) {
+            const tText = translations[currentLang];
             const panelHeader = document.querySelector('#panel-details .panel-header span');
-            if (panelHeader) panelHeader.innerText = 'Details';
+            if (panelHeader) panelHeader.innerText = tText.details;
 
             const panel = document.getElementById('dataPanel');
             const p = peopleData.find(x => x.id === id);
@@ -417,43 +585,43 @@
             tableHtml += `<center><h2>${p.name}</h2></center>`;
 
             if (p.variants && p.variants.length > 0) {
-                tableHtml += `<tr><th>naamsvarianten</th><td>${p.variants.join('; ')}</td></tr>`;
+                tableHtml += `<tr><th>${tText.variants}</th><td>${p.variants.join('; ')}</td></tr>`;
             }
 
             if (p.birth || p.place_birth) {
                 let bStr = `${p.birth || '?'} (${p.place_birth || '?'})`;
                 if (p.data_of_birth_prec) bStr += ` <br><small><i>${p.data_of_birth_prec}</i></small>`;
-                tableHtml += `<tr><th>geboren</th><td>${bStr}</td></tr>`;
+                tableHtml += `<tr><th>${tText.born}</th><td>${bStr}</td></tr>`;
             }
 
             if (p.death || p.place_death) {
                 let dStr = `${p.death || '?'} (${p.place_death || '?'})`;
                 if (p.date_of_death_prec) dStr += ` <br><small><i>${p.date_of_death_prec}</i></small>`;
-                tableHtml += `<tr><th>overleden</th><td>${dStr}</td></tr>`;
+                tableHtml += `<tr><th>${tText.died}</th><td>${dStr}</td></tr>`;
             }
 
             if (p.profession && p.profession.length > 0) {
-                tableHtml += `<tr><th>beroep</th><td>${p.profession.join(', ')}</td></tr>`;
+                tableHtml += `<tr><th>${tText.profession}</th><td>${p.profession.join(', ')}</td></tr>`;
             }
 
             if (p.nationality) {
-                tableHtml += `<tr><th>nationaliteit</th><td>${p.nationality}</td></tr>`;
+                tableHtml += `<tr><th>${tText.nationality}</th><td>${p.nationality}</td></tr>`;
             }
 
             if (p.biographical_note) {
-                tableHtml += `<tr><th>opmerking</th><td>${p.biographical_note}</td></tr>`;
+                tableHtml += `<tr><th>${tText.note}</th><td>${p.biographical_note}</td></tr>`;
             }
 
 
             if (p.RKDartist_id && p.RKDartist_id !== "none" && p.RKDartist_id.trim() !== "") {
-                tableHtml += `<tr><th>RKD link</th><td><a href="https://rkd.nl/artists/${p.RKDartist_id}" target="_blank" style="color: var(--accent-red); font-weight:500;">${p.RKDartist_id}</a></td></tr>`;
+                tableHtml += `<tr><th>${tText.note.includes('opmerking') ? 'RKD link' : 'RKD link'}</th><td><a href="https://rkd.nl/artists/${p.RKDartist_id}" target="_blank" style="color: var(--accent-red); font-weight:500;">${p.RKDartist_id}</a></td></tr>`;
             }
 
             tableHtml += '</table>';
 
             if (p.level === "A") {
                 const isInSelection = selectedArtists.has(id);
-                const btnText = isInSelection ? "Verwijder uit selectie" : "Voeg toe aan selectie";
+                const btnText = isInSelection ? tText.removeSelection : tText.addSelection;
                 const btnClass = isInSelection ? "action-btn remove-btn" : "action-btn add-btn";
 
                 let inlineStyle = "margin-top: 15px; width: 100%; padding: 10px 12px; border: 1px solid var(--border-dark); border-radius: 4px; cursor: pointer; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; transition: all 0.2s;";
@@ -497,15 +665,16 @@
             updateDataPanel(id);
         }
 
-        // --- 5B. Location Paneel (Map & Tijdlijn Klik Info) ---
+        // --- 5B. Location Panel (Map & Timeline click info) ---
         function updateLocationPanel(city, visits) {
+            const tText = translations[currentLang];
             const panelHeader = document.querySelector('#panel-details .panel-header span');
-            if (panelHeader) panelHeader.innerText = 'Locatie details';
+            if (panelHeader) panelHeader.innerText = tText.locDetails;
 
             const panel = document.getElementById('dataPanel');
 
             let html = `<center><h2>${city}</h2></center>`;
-            html += `<table style="margin-top: 10px;"><tr><th style="padding-bottom:8px;">Naam</th><th style="padding-bottom:8px;">Periode</th></tr>`;
+            html += `<table style="margin-top: 10px;"><tr><th style="padding-bottom:8px;">${tText.colName}</th><th style="padding-bottom:8px;">${tText.colPeriod}</th></tr>`;
 
             const seen = new Set();
             const uniqueVisits = visits.filter(v => {
@@ -523,13 +692,13 @@
 
                 html += `<tr style="color: ${color}; font-weight: ${weight}; opacity: ${opacity}; cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity='${opacity}'" onclick="setFocus('${v.id}')">
                             <td style="padding: 4px 4px; border-bottom: 1px dashed var(--border-light);">${v.name}</td>
-                            <td style="padding: 4px 4px; border-bottom: 1px dashed var(--border-light);">${v.time === '?' ? 'onbekend' : v.time}</td>
+                            <td style="padding: 4px 4px; border-bottom: 1px dashed var(--border-light);">${v.time === '?' ? tText.unknown : v.time}</td>
                          </tr>`;
             });
             html += `</table>`;
 
             let inlineStyle = "margin-top: 20px; width: 100%; padding: 10px 12px; background: var(--accent-dark); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;";
-            html += `<button class="action-btn add-btn" style="${inlineStyle}" onclick="filterByLocation('${city}')">Filter op deze locatie</button>`;
+            html += `<button class="action-btn add-btn" style="${inlineStyle}" onclick="filterByLocation('${city}')">${tText.filterThisLoc}</button>`;
 
             panel.innerHTML = html;
         }
@@ -602,6 +771,7 @@
         function updateTimeline() {
             const groups = new vis.DataSet();
             const items = new vis.DataSet();
+            const tText = translations[currentLang];
 
             const sortedArtists = peopleData
                 .filter(p => selectedArtists.has(p.id))
@@ -617,6 +787,8 @@
 
                 let bDate = safeDate(person.birth);
                 let dDate = safeDate(person.death);
+                let bPlace = person.place_birth ? person.place_birth.trim() : null;
+                let dPlace = person.place_death ? person.place_death.trim() : null;
 
                 let personTravels = travelsData.filter(t => t.artist_id === person.id);
                 let travelYears = personTravels.map(t => parseInt(safeDate(t.start)?.substring(0,4))).filter(y => !isNaN(y));
@@ -634,22 +806,22 @@
 
                 if (bYear && dYear) {
                     infClass = '';
-                    hoverText = `<div class="tooltip-header">Levensduur</div><strong>${bYear} - ${dYear}</strong>`;
+                    hoverText = `<div class="tooltip-header">${tText.lifeSpan}</div><strong>${bYear} - ${dYear}</strong>`;
                 } else if (bYear && !dYear) {
                     let endExt = maxTravelYear ? Math.max(bYear + 70, maxTravelYear + 5) : bYear + 70;
                     inferredEnd = `${endExt}-12-31`;
                     infClass = 'inferred-death';
-                    hoverText = `<div class="tooltip-header">Levensduur</div><strong>${bYear} - ?</strong><br><i>* Overlijdensdatum onzeker: afgeleid van reisgegevens of levensverwachting.</i>`;
+                    hoverText = `<div class="tooltip-header">${tText.lifeSpan}</div><strong>${bYear} - ?</strong><br><i>${tText.uncertainDeath}</i>`;
                 } else if (!bYear && dYear) {
                     let startExt = minTravelYear ? Math.min(dYear - 70, minTravelYear - 5) : dYear - 70;
                     inferredStart = `${startExt}-01-01`;
                     infClass = 'inferred-birth';
-                    hoverText = `<div class="tooltip-header">Levensduur</div><strong>? - ${dYear}</strong><br><i>* Geboortedatum onzeker: afgeleid van reisgegevens of levensverwachting.</i>`;
+                    hoverText = `<div class="tooltip-header">${tText.lifeSpan}</div><strong>? - ${dYear}</strong><br><i>${tText.uncertainBirth}</i>`;
                 } else if (!bYear && !dYear && minTravelYear && maxTravelYear) {
                     inferredStart = `${minTravelYear - 15}-01-01`;
                     inferredEnd = `${maxTravelYear + 15}-12-31`;
                     infClass = 'inferred-both';
-                    hoverText = `<div class="tooltip-header">Levensduur</div><strong>? - ?</strong><br><i>* Geboorte- en Overlijdensdatum onzeker: afgeleid van reisgegevens.</i>`;
+                    hoverText = `<div class="tooltip-header">${tText.lifeSpan}</div><strong>? - ?</strong><br><i>${tText.uncertainBoth}</i>`;
                 }
 
                 if (inferredStart && inferredEnd) {
@@ -661,9 +833,9 @@
                     });
                 }
 
-                if(bDate) items.add({ id: `b_${person.id}`, group: person.id, start: bDate,  type: 'point', title: `<div class="tooltip-header">Born</div><strong>${bDate}</strong>` });
-                if(dDate) items.add({ id: `d_${person.id}`, group: person.id, start: dDate,  type: 'point', title: `<div class="tooltip-header">Died</div><strong>${dDate}</strong>` });
-
+                if(bDate) items.add({ id: `b_${person.id}`, group: person.id, start: bDate,  type: 'point', title: `<div class="tooltip-header">${tText.born}</div><strong>${bPlace ? bPlace + ' ' : ''}(${bDate})</strong>` });
+                if(dDate) items.add({ id: `d_${person.id}`, group: person.id, start: dDate,  type: 'point', title: `<div class="tooltip-header">${tText.died}</div><strong>${dPlace ? dPlace + ' ' : ''}(${dDate})</strong>` }); 
+                
                 personTravels.forEach(t => {
                     let tStart = safeDate(t.start);
                     let tEnd = safeDate(t.end);
@@ -727,38 +899,36 @@
 
                     let titleHtml = `<div class="tooltip-header">${t.location}</div>`;
                     if (t.secondary_locations && t.secondary_locations.length > 0) {
-                        titleHtml += `<strong>Secondary:</strong> ${t.secondary_locations.join(', ')}<br>`;
+                        titleHtml += `<strong>${tText.secLoc}</strong> ${t.secondary_locations.join(', ')}<br>`;
                     }
 
                     if (t.start) {
                         let startStr = t.start;
                         if (t.start_date_prec) startStr += ` <i>(${t.start_date_prec})</i>`;
-                        titleHtml += `<strong>van:</strong> ${startStr}<br>`;
+                        titleHtml += `<strong>${tText.from}</strong> ${startStr}<br>`;
                     }
 
                     if (t.end) {
                         let endStr = t.end;
                         if (t.end_date_prec) endStr += ` <i>(${t.end_date_prec})</i>`;
-                        titleHtml += `<strong>tot:</strong> ${endStr}<br>`;
+                        titleHtml += `<strong>${tText.to}</strong> ${endStr}<br>`;
                     }
 
                     if ((!t.start || !t.end) && hasConfirmed) {
-                        titleHtml += `<strong>bekende data:</strong> ${cDates.join(', ')}<br>`;
+                        titleHtml += `<strong>${tText.knownDates}</strong> ${cDates.join(', ')}<br>`;
                     }
 
                     if (t.financial_means_of_travel && t.financial_means_of_travel.trim() !== '' && t.financial_means_of_travel !== 'unknown') {
-                        titleHtml += `<strong>financiering:</strong> ${t.financial_means_of_travel}<br>`;
+                        titleHtml += `<strong>${tText.financing}</strong> ${t.financial_means_of_travel}<br>`;
                     }
 
                     if (t.description && t.description.trim() !== '') {
-                        titleHtml += `<div class="tooltip-note"><strong>opmerking:</strong> ${t.description}</div>`;
+                        titleHtml += `<div class="tooltip-note"><strong>${tText.note}</strong> ${t.description}</div>`;
                     }
 
                     if (t.event_note && t.event_note.trim() !== '') {
-                        titleHtml += `<div class="tooltip-note"><strong>noot:</strong> ${t.event_note}</div>`;
+                        titleHtml += `<div class="tooltip-note"><strong>${tText.eventNote}</strong> ${t.event_note}</div>`;
                     }
-
-
 
                     items.add({
                         id: `t_${t.event_id}`, group: person.id,
@@ -861,7 +1031,6 @@
             });
         }
 
-        // --- UPDATE: Map en Active Cities ---
         function initMap() {
             map = L.map('map-container').setView([48.85, 2.35], 4);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -871,6 +1040,7 @@
 
         function updateMap() {
             map.eachLayer(layer => { if(layer instanceof L.Marker) map.removeLayer(layer); });
+            const tText = translations[currentLang];
 
             const activeCities = new Set();
             peopleData.filter(p => selectedArtists.has(p.id)).forEach(p => {
@@ -878,7 +1048,6 @@
             });
             travelsData.filter(t => selectedArtists.has(t.artist_id)).forEach(t => {
                 if(t.location && locDict[t.location]) activeCities.add(t.location.trim());
-                // Markeer de stad OOK als actief als het een secundaire locatie was
                 if(t.secondary_locations && Array.isArray(t.secondary_locations)) {
                     t.secondary_locations.forEach(sl => {
                         let sloc = sl.trim();
@@ -912,7 +1081,6 @@
             if(bounds.length > 0) map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
         }
 
-        // --- UPDATE: Focus inclusief secundaire locatie coördinaten ---
         function setFocus(artistId, skipZooming = false) {
             focusedArtistId = artistId;
             updateDataPanel(artistId);
@@ -1064,29 +1232,25 @@
             }
         }
 
-        // --- 10. Algemene Reset ---
+        // --- 10. General Reset ---
         function resetDashboard() {
-            // 1. Wis de focus (deselecteer de actieve kunstenaar)
+            const tText = translations[currentLang];
             focusedArtistId = null;
 
-            // 2. Maak het details-paneel weer leeg
             const panelHeader = document.querySelector('#panel-details .panel-header span');
-            if (panelHeader) panelHeader.innerText = 'Details';
-            document.getElementById('dataPanel').innerHTML = '<i style="color: var(--text-muted);">Klik op een naam in de tijdslijn, het netwerk of de kaart om details te zien.</i>';
+            if (panelHeader) panelHeader.innerText = tText.details;
+            document.getElementById('dataPanel').innerHTML = `<i style="color: var(--text-muted);" data-i18n="clickPrompt">${tText.clickPrompt}</i>`;
 
-            // 3. Reset de tijd-sliders naar de originele waardes
             document.getElementById('timeMin').value = 1700;
             document.getElementById('timeMax').value = 1950;
             document.getElementById('timeMinVal').innerText = 1700;
             document.getElementById('timeMaxVal').innerText = 1950;
 
-            // 4. Maak zoekvelden in de dropdowns leeg en herstel de zichtbaarheid
             document.querySelectorAll('.filter-search').forEach(input => {
                 input.value = '';
                 searchChecklist(input.closest('.dropdown-content').querySelector('.checklist').id, '');
             });
 
-            // 5. Vink álle checkboxes in de dropdowns weer aan en update de datalijsten
             checkedNames.clear();
             checkedLocations.clear();
 
@@ -1100,14 +1264,12 @@
                 checkedLocations.add(cb.value);
             });
 
-            // 6. Pas alle filters opnieuw toe (dit tekent het dashboard opnieuw met álle data)
             applyFilters();
 
-            // 7. Herstel de 'camera's' van de 3 hoofdvisualisaties
             setTimeout(() => {
-                tlReset();      // Tijdlijn naar 1700-1950
-                netFit();       // Netwerk in het midden
-                if(map) map.setView([48.85, 2.35], 4); // Kaart terug naar Europa
+                tlReset();
+                netFit();
+                if(map) map.setView([48.85, 2.35], 4);
             }, 100);
         }
 
