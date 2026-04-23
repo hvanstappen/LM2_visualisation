@@ -92,10 +92,10 @@ details[open] summary.filter-btn::after { transform: rotate(180deg); }
 .checklist li:hover { background: var(--highlight-bg); }
 .checklist input[type="checkbox"] { accent-color: var(--accent-red); cursor: pointer; margin: 0; width: 14px; height: 14px; flex-shrink: 0; }
 
-/* Facet en Search hiders */
+/* Facet & Search hiders */
 .checklist li.facet-hidden, .checklist li.search-hidden { display: none !important; }
 
-/* Dubbele Slider (Topbar) */
+/* Double Slider (Topbar) */
 .filter-slider-container { display: flex; align-items: center; gap: 15px; margin-left: 20px; padding-left: 20px; border-left: 1px solid var(--border-light); }
 .filter-slider-container .filter-header { font-size: 0.85rem; font-weight: 600; color: var(--accent-dark); white-space: nowrap; }
 .slider-wrapper { position: relative; height: 30px; width: 200px; display: flex; align-items: center; }
@@ -147,29 +147,55 @@ details[open] summary.filter-btn::after { transform: rotate(180deg); }
 }
 
 .details-panel {
-    flex: 0 0 350px; /* Vaste breedte voor details */
+    flex: 0 0 350px; /* Fixed width for details */
     border-right: 1px solid var(--border-dark);
 }
 
 .network-panel {
-    flex: 1; /* Neemt overgebleven ruimte in */
+    flex: 1; /* Takes up remaining space */
     border-right: 1px solid var(--border-dark);
 }
 
 .map-panel {
-    flex: 1; /* Neemt overgebleven ruimte in */
+    flex: 1; /* Takes up remaining space */
 }
 
 /* Maximize CSS States */
-.dashboard-content.max-timeline .bottom-wrapper { display: none !important; }
-.dashboard-content.max-timeline .timeline-wrapper { border-bottom: none; }
-.dashboard-content.max-network .timeline-wrapper { display: none !important; }
-.dashboard-content.max-network .details-panel { display: none !important; }
-.dashboard-content.max-network .map-panel { display: none !important; }
-.dashboard-content.max-network .network-panel { border-right: none; }
-.dashboard-content.max-map .timeline-wrapper { display: none !important; }
-.dashboard-content.max-map .details-panel { display: none !important; }
-.dashboard-content.max-map .network-panel { display: none !important; }
+
+/* 1. Timeline maximized: hide network and map. 
+   Timeline is absolutely positioned on the right over the full height. */
+.dashboard-content.max-timeline .network-panel,
+.dashboard-content.max-timeline .map-panel { 
+    display: none !important; 
+}
+.dashboard-content.max-timeline .timeline-wrapper { 
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: calc(100% - 350px);
+    height: 100%;
+    z-index: 10;
+    border-bottom: none; 
+}
+
+/* 2. Network maximized: hide timeline and map. 
+   Details stays on the left, network takes up the rest. */
+.dashboard-content.max-network .timeline-wrapper,
+.dashboard-content.max-network .map-panel { 
+    display: none !important; 
+}
+.dashboard-content.max-network .network-panel { 
+    border-right: none; 
+}
+
+/* 3. Map maximized: hide timeline and network. 
+   Details stays on the left, map takes up the rest. */
+.dashboard-content.max-map .timeline-wrapper,
+.dashboard-content.max-map .network-panel { 
+    display: none !important; 
+}
+
 
 /* --- Data Panel Styling (Inside details-panel) --- */
 .data-panel { padding: 15px 20px; font-size: 0.85rem; }
@@ -186,7 +212,18 @@ details[open] summary.filter-btn::after { transform: rotate(180deg); }
 .vis-item.vis-background.inferred-death { background-color: transparent !important; background-image: linear-gradient(to left, transparent, #eef1fb 20%); }
 .vis-item.vis-background.inferred-both { background-color: transparent !important; background-image: linear-gradient(to right, transparent, #eef1fb 20%, #eef1fb 80%, transparent); }
 
-/* --- Geselecteerde Tijdlijn Items (Zwart Kader) --- */
+/* Make dots on Timeline bigger and give them  accent color */
+.vis-item.vis-point .vis-dot {
+    border-width: 3px !important;            
+    width: 10px !important;                  
+    height: 10px !important;                 
+    border-color: var(--accent-red) !important; 
+    background-color: var(--accent-red) !important;
+    box-shadow: 0 0 4px rgba(0,0,0,0.3);     
+    border-radius: 50%;
+}
+
+/* Selected Timeline Items (Black Border) */
 .vis-item.vis-selected.travel-event {
     background-color: var(--accent-red) !important;
     border: 2px solid #000000 !important;
@@ -217,7 +254,7 @@ details[open] summary.filter-btn::after { transform: rotate(180deg); }
 .vis-labelset .vis-label.focused-vis-label { background-color: var(--highlight-bg); border-left-color: var(--accent-dark); }
 .vis-labelset .vis-label.focused-vis-label .vis-inner { font-weight: 600; }
 
-/* --- Lijn de Tijdlijn-kolom uit met het Details paneel --- */
+/* --- Align the Timeline column with the Details panel --- */
 .vis-labelset .vis-label {
     width: 350px !important;
     min-width: 350px !important;
@@ -225,13 +262,13 @@ details[open] summary.filter-btn::after { transform: rotate(180deg); }
     box-sizing: border-box;
 }
 
-/* Zorg dat het rechterrandje exact matcht met de grenslijn eronder */
+/* make sure the right edge matches the border below */
 .vis-panel.vis-left {
     border-right: 1px solid var(--border-dark) !important;
 }
 
 
-/* Actieknop in het Details Paneel */
+/* Action button in the Details Panel */
 .action-btn {
     margin-top: 15px;
     padding: 10px 12px;
@@ -262,9 +299,9 @@ details[open] summary.filter-btn::after { transform: rotate(180deg); }
     color: var(--accent-dark);
 }
 
-/* --- PERFECTE UITLIJNING & SCROLLBARS --- */
+/* --- PERFECT ALIGNMENT & SCROLLBARS --- */
 
-/* 1. Het details-paneel links onderin */
+/* 1. Details panel bottom left */
 .details-panel {
     flex: 0 0 350px !important;
     width: 350px !important;
@@ -273,7 +310,7 @@ details[open] summary.filter-btn::after { transform: rotate(180deg); }
     box-sizing: border-box;
 }
 
-/* 2. De namenlijst in de tijdlijn links bovenin */
+/* 2. Name list in Timelinetop left */
 .vis-panel.vis-left {
     width: 350px !important;
     min-width: 350px !important;
@@ -281,13 +318,13 @@ details[open] summary.filter-btn::after { transform: rotate(180deg); }
     border-right: 1px solid var(--border-dark) !important;
     box-sizing: border-box;
 
-    /* ZET DE SCROLLBAR TERUG! */
+    /* PUT SCROLLBAR BACK */
     overflow-y: scroll !important;
     overflow-x: hidden !important;
 }
 
-/* 3. Pas de breedte van de labels aan zodat de scrollbar er exact in past */
-/* 350px totaal - 1px border - 8px scrollbar = 341px */
+/* 3. Adjust width of labels so scrollbar fits perfectly */
+/* 350px total - 1px border - 8px scrollbar = 341px */
 .vis-labelset .vis-label {
     width: 340px !important;
     min-width: 340px !important;
@@ -295,18 +332,18 @@ details[open] summary.filter-btn::after { transform: rotate(180deg); }
     box-sizing: border-box;
 }
 
-/* --- SCROLLBAR LOGICA --- */
+/* --- SCROLLBAR LOGIC --- */
 
-/* Forceer ook altijd een scrollbar in het data-paneel voor perfecte symmetrie */
+/* Force always a scrollbar in the data-panel for perfect symmetry */
 .data-panel, .checklist {
     overflow-y: scroll !important;
     overflow-x: hidden !important;
 }
 
-/* Elegante, moderne scrollbars (8px breed) voor de hele applicatie */
+/* Scrollbars (12px width) */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 12px;
+    height: 12px;
 }
 ::-webkit-scrollbar-track {
     background: transparent;
@@ -319,11 +356,11 @@ details[open] summary.filter-btn::after { transform: rotate(180deg); }
     background: var(--text-muted);
 }
 
-/* --- Zwevende Navigatie Controls --- */
+/* --- Floating Navigation Controls --- */
 .nav-controls {
     position: absolute;
-    top: 55px; /* Onder de header */
-    right: 25px; /* Net links van de scrollbar */
+    top: 55px; /* Below the header */
+    right: 25px; /* Just to the left of the scrollbar */
     display: flex;
     gap: 4px;
     z-index: 1000;
