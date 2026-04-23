@@ -1,7 +1,9 @@
 # Apprentice-Master Network Dashboard
 
 A JavaScript Single Page Application (SPA) designed to visualize, filter, and explore historical data concerning artists, their geographical movements, and their professional relationships. The application integrates three distinct visualization paradigms—chronological (Timeline), relational (Network), and geospatial (Map)—into a highly synchronized, interactive dashboard.
-This page was developed as part of the [Leerling Meester project](https://www.museabrugge.be/collectie/onderzoek/leerling_meester_ii) bij [Datable](http://datable.be)
+This page was developed as part of the [Leerling Meester project](https://www.museabrugge.be/collectie/onderzoek/leerling_meester_ii) by [Datable](http://datable.be). 
+
+See the [user guide](https://github.com/hvanstappen/LM2_visualisation/blob/main/help.md) for instructions in Dutch/English
 
 ## 🚀 Features
 * **Faceted Cross-Filtering:** Real-time filtering across time periods, geographical locations, and specific artist names.
