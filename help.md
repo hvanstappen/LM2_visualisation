@@ -2,7 +2,7 @@
 ---
 
 # 🇳🇱 Gebruikershandleiding: Leerling-Meester Netwerk Dashboard
-(For 🇬🇧 English, see [below](https://github.com/hvanstappen/LM2_visualisation/new/main#-user-guide-apprentice-master-network-dashboard))
+(For 🇬🇧 English, see below)
 
 Met deze interactieve applicatie kun je de historische relaties, geografische verplaatsingen en levenslopen van kunstenaars verkennen.
 
