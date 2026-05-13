@@ -128,7 +128,6 @@
     <script src="libraries/cytoscape.min.js"></script>
     <script src="libraries/leaflet.js"></script>
     <script src="source_data/leerling_meester_sourcedata.js"></script>
-
     <script>
         // --- 0. Dictionary ---
         const translations = {
@@ -170,7 +169,7 @@
                 died: "overleden",
                 profession: "beroep",
                 nationality: "nationaliteit",
-                note: "opmerking",
+                note: "opmerking:",
                 addSelection: "Voeg toe aan selectie",
                 removeSelection: "Verwijder uit selectie",
                 locDetails: "Locatie details",
@@ -182,13 +181,15 @@
                 uncertainDeath: "* Overlijdensdatum onzeker: afgeleid van reisgegevens of levensverwachting.",
                 uncertainBirth: "* Geboortedatum onzeker: afgeleid van reisgegevens of levensverwachting.",
                 uncertainBoth: "* Geboorte- en Overlijdensdatum onzeker: afgeleid van reisgegevens.",
-                secLoc: "Secundair:",
+                secLoc: "secundaire locaties:",
                 from: "van:",
                 to: "tot:",
                 knownDates: "bekende data:",
                 financing: "financiering:",
                 eventNote: "noot:",
-                artistsSelected: "kunstenaars geselecteerd"
+                artistsSelected: "kunstenaars geselecteerd",
+                andXOthers: "en {count} anderen...",
+                clickForDetails: "→ Klik op de marker voor alle namen in het zijpaneel"
             },
             en: {
                 // Labels
@@ -240,13 +241,15 @@
                 uncertainDeath: "* Date of death uncertain: derived from travel data or life expectancy.",
                 uncertainBirth: "* Date of birth uncertain: derived from travel data or life expectancy.",
                 uncertainBoth: "* Birth and death dates uncertain: derived from travel data.",
-                secLoc: "Secondary:",
+                secLoc: "secondary locations:",
                 from: "from:",
                 to: "to:",
                 knownDates: "known dates:",
                 financing: "financing:",
                 eventNote: "note:",
-                artistsSelected: "artists selected"
+                artistsSelected: "artists selected",
+                andXOthers: "and {count} others...",
+                clickForDetails: "→ Click marker for all names in the side panel"
             }
         };
 
@@ -387,7 +390,7 @@
                     let tEnd = t.end || '?';
                     let timeStr = (tStart !== '?' || tEnd !== '?') ? `${tStart} - ${tEnd}` : '?';
 
-                    // Primaire locatie
+                    // Primary location
                     let loc = t.location ? t.location.trim() : null;
                     if(loc && locDict[loc]) {
                         if(!globalLocationVisits[loc]) globalLocationVisits[loc] = [];
@@ -411,6 +414,8 @@
         // --- 3. Build UI for Filters ---
         function buildFilterUI() {
             const nameListEl = document.getElementById('nameFilter');
+            nameListEl.innerHTML = ''; 
+            
             peopleData.filter(p => p.level === "A").sort((a,b) => a.name.localeCompare(b.name)).forEach(p => {
                 checkedNames.add(p.id);
 
@@ -428,10 +433,20 @@
 
                 li.appendChild(cb);
                 li.appendChild(span);
+                
+                li.addEventListener('click', function(e) {
+                    if (e.target !== cb) {
+                        cb.checked = !cb.checked; 
+                        toggleIndividualFilter('nameFilter', cb.value, cb.checked);
+                    }
+                });
+
                 nameListEl.appendChild(li);
             });
 
             const locListEl = document.getElementById('locFilter');
+            locListEl.innerHTML = '';
+            
             window.allSortedLocations.forEach(loc => {
                 checkedLocations.add(loc);
 
@@ -449,6 +464,14 @@
 
                 li.appendChild(cb);
                 li.appendChild(span);
+                
+                li.addEventListener('click', function(e) {
+                    if (e.target !== cb) {
+                        cb.checked = !cb.checked;
+                        toggleIndividualFilter('locFilter', cb.value, cb.checked);
+                    }
+                });
+
                 locListEl.appendChild(li);
             });
         }
@@ -950,23 +973,75 @@
                 container: document.getElementById('network-container'),
                 style: [
                     { selector: 'node', style: {
-                        'label': 'data(name)', 'font-size': '6px', 'text-valign': 'bottom', 'text-margin-y': 5,
-                        'background-color': '#d6d3d1', 'opacity': 0.2, 'width': 'data(size)', 'height': 'data(size)', 'font-family': 'Inter, sans-serif'
+                        'label': 'data(name)', 'font-size': '10px', 'text-valign': 'bottom', 'text-margin-y': 5,
+                        'background-color': '#d6d3d1', 'opacity': 0.8, 'width': 'data(size)', 'height': 'data(size)', 'font-family': 'Inter, sans-serif'
                     }},
                     { selector: 'edge', style: {
-                        'width': 0.8, 'line-color': '#e7e5e4', 'source-arrow-color': '#e7e5e4',
-                        'source-arrow-shape': 'triangle', 'curve-style': 'bezier', 'opacity': 0.2, 'font-size': '4px'
+                        'width': 0.8, 
+                        'line-color': '#e7e5e4', 
+                        'opacity': 0.6, 
+                        'curve-style': 'bezier',
+                        // Arrows
+                        'target-arrow-shape': 'triangle',
+                        'target-arrow-color': '#e7e5e4',
+                        'arrow-scale': 0.6,
+                        // Labels
+                        'label': 'data(type)',
+                        'font-size': '7px',
+                        'text-rotation': 'autorotate', 
+                        'color': '#57534e',
+                        'text-opacity': 0.8,
+                        'text-margin-y': -5 
                     }},
-                    { selector: '.selected', style: { 'background-color': '#ea1128', 'opacity': 1, 'color': '#1c1917', 'font-weight': 'bold' } },
-                    { selector: '.connected', style: { 'background-color': '#ea1128', 'opacity': 0.4 } },
-                    { selector: '.focused', style: { 'border-width': 4, 'border-color': '#292524', 'opacity': 1 } },
-                    { selector: 'edge.active', style: { 'line-color': '#fca5a5', 'source-arrow-color': '#fca5a5', 'opacity': 0.8, 'label': 'data(type)', 'font-size': '4px', 'text-rotation': 'autorotate', 'color': '#57534e' } }
+                    { selector: '.selected', style: { 'background-color': '#ea1128', 'opacity': 1, 'font-weight': 'bold' } },
+                    { selector: '.connected', style: { 'background-color': '#fca5a5', 'opacity': 1 } },
+                    
+                    { selector: '.layer-3', style: { 'display': 'none' } },
+                    { selector: 'edge.to-layer-3', style: { 'display': 'none' } },
+
+                    { selector: 'edge.active', style: {
+                        'line-color': '#fca5a5',
+                        'target-arrow-color': '#fca5a5',
+                        'opacity': 0.8,
+                        'width': 1.2
+                    }},
+
+                    { selector: '.faded', style: { 'opacity': 0.05, 'text-opacity': 0 } },
+
+                    // -Spotlight effect for hover ---
+                    { selector: '.highlighted', style: { 
+                        'display': 'element',
+                        'opacity': 1, 
+                        'z-index': 10,
+                        'background-color': '#ea1128',
+                        'color': '#1c1917',
+                        'font-weight': 'bold'
+                    }},
+                    { selector: 'edge.highlighted', style: { 
+                        'display': 'element',
+                        'width': 1.5, 
+                        'opacity': 1, 
+                        'line-color': '#ea1128',
+                        'target-arrow-color': '#ea1128', 
+                        'font-size': '7px',
+                        'text-opacity': 1,
+                        'z-index': 10
+                    }}
                 ],
                 layout: { name: 'cose', padding: 15 }
             });
 
-            cy.on('tap', 'node', function(evt){
-                setFocus(evt.target.id());
+            cy.on('tap', 'node', function(evt){ setFocus(evt.target.id()); });
+
+            cy.on('mouseover', 'node', function(evt) {
+                const node = evt.target;
+                const neighborhood = node.closedNeighborhood(); 
+                cy.elements().addClass('faded');
+                neighborhood.removeClass('faded').addClass('highlighted');
+            });
+
+            cy.on('mouseout', 'node', function(evt) {
+                cy.elements().removeClass('faded highlighted');
             });
         }
 
@@ -975,60 +1050,78 @@
             const nodeMap = new Map();
             const validNodeIds = new Set(peopleData.map(p => p.id));
 
-            peopleData.forEach(p => {
-                nodeMap.set(p.id, {
-                    data: { id: p.id, name: p.name, size: 10 },
-                    classes: selectedArtists.has(p.id) ? 'selected' : ''
-                });
+            // 1. Identify node layers
+            const layer1 = new Set(selectedArtists);
+            const layer2 = new Set();
+            const layer3 = new Set();
+
+            // Search for layer 2
+            relationsData.forEach(r => {
+                if (layer1.has(r.source) && validNodeIds.has(r.target)) layer2.add(r.target);
+                if (layer1.has(r.target) && validNodeIds.has(r.source)) layer2.add(r.source);
+            });
+            layer1.forEach(id => layer2.delete(id)); 
+
+            // Search for layer 3
+            relationsData.forEach(r => {
+                if (layer2.has(r.source) && validNodeIds.has(r.target) && !layer1.has(r.target) && !layer2.has(r.target)) layer3.add(r.target);
+                if (layer2.has(r.target) && validNodeIds.has(r.source) && !layer1.has(r.source) && !layer2.has(r.source)) layer3.add(r.source);
             });
 
+            // 2. Make Nodes
+            peopleData.forEach(p => {
+                if (layer1.has(p.id) || layer2.has(p.id) || layer3.has(p.id)) {
+                    let className = '';
+                    if (layer1.has(p.id)) className = 'selected';
+                    else if (layer2.has(p.id)) className = 'connected';
+                    else className = 'layer-3';
+
+                    nodeMap.set(p.id, {
+                        data: { id: p.id, name: p.name, size: 10 },
+                        classes: className
+                    });
+                }
+            });
+
+            // 3. Make Edges
             relationsData.forEach((r, index) => {
-                if(r.source && r.target && validNodeIds.has(r.source) && validNodeIds.has(r.target)) {
-                    let relId = r.relation_id || `edge_${index}`;
+                if(nodeMap.has(r.source) && nodeMap.has(r.target)) {
+                    let edgeClass = '';
+                    if (nodeMap.get(r.source).classes === 'layer-3' || nodeMap.get(r.target).classes === 'layer-3') {
+                        edgeClass = 'to-layer-3';
+                    }
+
                     elements.push({
-                        data: { id: relId, source: r.source, target: r.target, type: (r.type || []).join(', ') }
+                        data: { id: `e${index}`, source: r.source, target: r.target, type: (r.type || []).join(', ') },
+                        classes: edgeClass
                     });
 
-                    if(nodeMap.has(r.source)) nodeMap.get(r.source).data.size += 1;
-                    if(nodeMap.has(r.target)) nodeMap.get(r.target).data.size += 1;
+                    nodeMap.get(r.source).data.size += 1;
+                    nodeMap.get(r.target).data.size += 1;
                 }
             });
 
-            peopleData.forEach(p => {
-                let n = nodeMap.get(p.id);
-                if (!selectedArtists.has(p.id)) {
-                    let isConnected = relationsData.some(r =>
-                        (r.source === p.id && selectedArtists.has(r.target)) ||
-                        (r.target === p.id && selectedArtists.has(r.source))
-                    );
-                    if(isConnected) n.classes = 'connected';
-                }
-
-                if (p.id === focusedArtistId) {
-                    n.classes += ' focused';
-                }
-
+            // 4. Add nodes to array
+            nodeMap.forEach((n, id) => {
+                if (id === focusedArtistId) n.classes += ' focused';
                 elements.push(n);
             });
 
+            // 5. Redraw netwerk
             cy.elements().remove();
             cy.add(elements);
-
             cy.layout({
                 name: 'cose',
-                componentSpacing: 100,
-                nodeOverlap: 20,
+                idealEdgeLength: function(edge) { return 100; }, // Maakt de verbindingslijnen langer (standaard is 32)
+                nodeRepulsion: function(node) { return 50000; }, // Duwt de knopen veel harder uit elkaar (standaard is 2048)
+                nodeOverlap: 50,                                 // Geeft knopen meer marge om niet te overlappen
+                componentSpacing: 150,                           // Zet losse groepjes verder uit elkaar
+                // --- STANDAARD INSTELLINGEN ---
                 refresh: 20,
                 fit: true,
-                padding: 30,
+                padding: 50,
                 randomize: false
             }).run();
-
-            cy.edges().forEach(e => {
-                if(selectedArtists.has(e.source().id()) || selectedArtists.has(e.target().id())) {
-                    e.addClass('active');
-                }
-            });
         }
 
         function initMap() {
@@ -1064,10 +1157,26 @@
                 const visits = globalLocationVisits[city] || [];
 
                 const uniqueVisitsStrings = [...new Set(visits.map(v => v.time === '?' ? v.name : `${v.name} (${v.time})`))];
+                
+                // Number of items  in popup 
+                const MAX_ITEMS = 5;
+                let displayList = uniqueVisitsStrings.slice(0, MAX_ITEMS);
+                let extraCount = uniqueVisitsStrings.length - MAX_ITEMS;
+
+                let listHtml = displayList.join('<br>');
+                
+                if (extraCount > 0) {
+                    let extraText = tText.andXOthers.replace('{count}', extraCount);
+                    listHtml += `<br><i style="color: var(--text-muted); margin-top: 4px; display: block;">${extraText}</i>`;
+                }
+
                 const tooltipHtml = `
                     <div style="font-family: 'Inter', sans-serif; font-size: 0.85rem; color: #1c1917; line-height: 1.5;">
                         <div style="font-size: 1.05rem; font-weight: 700; color: #EA1128; margin-bottom: 6px; border-bottom: 1px solid #e7e5e4; padding-bottom: 4px;">${city}</div>
-                        ${uniqueVisitsStrings.join('<br>')}
+                        ${listHtml}
+                        <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed #e7e5e4; font-weight: 600; color: #EA1128; font-size: 0.8rem;">
+                            ${tText.clickForDetails}
+                        </div>
                     </div>`;
                 marker.bindTooltip(tooltipHtml);
                 bounds.push([coords.lat, coords.lon]);
