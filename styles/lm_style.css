@@ -228,7 +228,7 @@ details[open] summary.filter-btn::after { transform: rotate(180deg); }
     background-color: var(--accent-red) !important;
     border: 2px solid #000000 !important;
     box-shadow: 0 0 8px rgba(0,0,0,0.3) !important;
-    z-index: 10 !important; /* Zorgt dat het blokje visueel boven de rest uitspringt */
+    z-index: 10 !important;
 }
 
 /* Timeline Fades */
@@ -242,7 +242,22 @@ details[open] summary.filter-btn::after { transform: rotate(180deg); }
 .vis-item .vis-item-content { overflow: visible !important; white-space: nowrap; text-shadow: 0px 0px 4px rgba(255, 255, 255, 0.9), 0px 0px 2px rgba(255, 255, 255, 0.9); }
 
 /* Timeline Tooltips */
-.vis-tooltip { background-color: #ffffff; border: 1px solid var(--border-dark); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); border-radius: 2px; padding: 15px 20px; font-family: 'Inter', system-ui, sans-serif !important; font-size: 0.85rem; color: var(--text-main); z-index: 1000 !important; line-height: 1.6; max-width: 320px; }
+.vis-tooltip {
+    background-color: #ffffff;
+    border: 1px solid var(--border-dark);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+    padding: 15px 20px;
+    font-family: 'Inter', system-ui, sans-serif !important;
+    font-size: 0.85rem;
+    color: var(--text-main);
+    z-index: 1000 !important;
+    line-height: 1.6;
+    max-width: 320px;
+    white-space: normal !important;
+    overflow-wrap: break-word !important;
+    word-wrap: break-word !important;
+}
 .vis-tooltip strong { color: var(--accent-dark); font-weight: 600; }
 .vis-tooltip i { color: var(--text-muted); font-size: 0.8rem; font-style: italic; }
 .vis-tooltip .tooltip-header { font-size: 1.05rem; font-weight: 700; color: var(--accent-red); margin-bottom: 8px; border-bottom: 1px solid var(--border-light); padding-bottom: 4px; }
@@ -359,8 +374,8 @@ details[open] summary.filter-btn::after { transform: rotate(180deg); }
 /* --- Floating Navigation Controls --- */
 .nav-controls {
     position: absolute;
-    top: 55px; /* Below the header */
-    right: 25px; /* Just to the left of the scrollbar */
+    top: 55px;
+    right: 25px;
     display: flex;
     gap: 4px;
     z-index: 1000;
